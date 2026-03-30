@@ -28,7 +28,7 @@ Helmet theft is a common problem for two‑wheeler riders. This project addresse
   <li>GSM Commands</li>
   <li>Flutter</li>
   <li>Python (optional for data analysis)</li>
-  <li>Firebase - for real-time notifications</li>
+  <li>Firebase - for real-time notifications </li>
 </ul>
 
 
