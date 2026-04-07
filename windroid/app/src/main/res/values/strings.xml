@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Windroid</string>
+    <string name="accessibility_service_description">Allows clipboard sync with PC and remote input control. This service can read clipboard content and perform touch gestures on your behalf when controlled from PC.</string>
+</resources>
