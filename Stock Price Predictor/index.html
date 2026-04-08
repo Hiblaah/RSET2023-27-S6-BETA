@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Stock Predictor</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
+
+    <style>
+        :root {
+            --color-primary: #2563eb;
+            --color-primary-dark: #1e40af;
+            --color-success: #10b981;
+            --color-danger: #ef4444;
+            --color-warning: #f59e0b;
+            --color-info: #06b6d4;
+            --color-bg: #f8fafc;
+            --color-surface: #ffffff;
+            --color-text: #1e293b;
+            --color-text-light: #64748b;
+            --color-border: #e2e8f0;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--color-bg);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        .container { max-width: 1400px; margin: 0 auto; }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+            border-radius: 16px;
+            color: white;
+            box-shadow: 0 10px 40px rgba(37, 99, 235, 0.3);
+        }
+
+        h1 { font-size: clamp(2rem, 5vw, 3rem); margin-bottom: 10px; font-weight: 700; }
+        .subtitle { font-size: clamp(1rem, 3vw, 1.2rem); opacity: 0.95; }
+
+        .card {
+            background: var(--color-surface);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            margin-bottom: 24px;
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--color-primary-dark);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .form-group { margin-bottom: 20px; }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+            color: var(--color-text);
+        }
+
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--color-border);
+            border-radius: 10px;
+            font-size: 1rem;
+            background: var(--color-bg);
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+        }
+
+        /* Metrics */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+        }
+
+        .metric-box {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            border-left: 4px solid var(--color-primary);
+        }
+
+        .metric-box div:first-child {
+            font-size: 0.85rem;
+            color: var(--color-text-light);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .metric-box .value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--color-primary-dark);
+        }
+
+        /* Prediction cards */
+        .predictions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+        }
+
+        .pred-card {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border-left: 4px solid var(--color-warning);
+        }
+
+        .pred-card.bullish {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border-left-color: var(--color-success);
+        }
+
+        .pred-card.bearish {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border-left-color: var(--color-danger);
+        }
+
+        .pred-card h3 {
+            font-size: 0.9rem;
+            color: var(--color-text-light);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .pred-card .price {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-text);
+            margin: 6px 0;
+        }
+
+        .pred-card .change {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        .pred-card .range {
+            font-size: 0.85rem;
+            color: var(--color-text-light);
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        /* News cards */
+        .news-card {
+            background: white;
+            border-left: 4px solid var(--color-primary);
+            padding: 16px;
+            margin-bottom: 16px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+
+        .news-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateX(4px);
+        }
+
+        .news-title a { color: var(--color-text); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+        .news-title a:hover { color: var(--color-primary-dark); text-decoration: underline; }
+        .news-meta { font-size: 0.8rem; color: var(--color-text-light); margin-top: 8px; }
+
+        .sentiment-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .badge-positive { background: #d1fae5; color: #065f46; }
+        .badge-negative { background: #fee2e2; color: #991b1b; }
+        .badge-neutral  { background: #fef3c7; color: #92400e; }
+
+        /* Loading overlay */
+        #loadingOverlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.8);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            z-index: 9999;
+            backdrop-filter: blur(6px);
+        }
+
+        .spinner {
+            border: 4px solid rgba(255,255,255,0.2);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .loading-text { font-size: 1.3rem; font-weight: 500; }
+
+        /* Chart */
+        .chart-wrapper {
+            position: relative;
+            height: 450px;
+            width: 100%;
+        }
+
+        #priceChart {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 12px; }
+            .card { padding: 20px; }
+            .chart-wrapper { height: 360px; }
+            h1 { font-size: 2.2rem; }
+        }
+
+        @media (max-width: 480px) {
+            .chart-wrapper { height: 300px; }
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="loadingOverlay">
+    <div class="spinner"></div>
+    <div class="loading-text">Generating Forecast...</div>
+</div>
+
+<div class="container">
+
+    <header>
+        <h1>Stock Price Predictor</h1>
+        <p class="subtitle">ML Forecast + Sentiment Intelligence</p>
+    </header>
+
+    <div class="card">
+        <h2>Select Stock & Horizon</h2>
+
+        <div class="form-group">
+            <label for="stockSymbol">Stock</label>
+            <select id="stockSymbol">
+                <option value="RELIANCE.NS">Reliance</option>
+                <option value="TCS.NS">TCS</option>
+                <option value="HDFCBANK.NS">HDFC Bank</option>
+                <option value="INFY.NS">Infosys</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="forecastHorizon">Forecast Horizon</label>
+            <select id="forecastHorizon">
+                <option value="1">Tomorrow</option>
+                <option value="7" selected>7 Days</option>
+                <option value="30">30 Days</option>
+            </select>
+        </div>
+
+        <button onclick="runPrediction()">Generate Forecast</button>
+    </div>
+
+    <div class="card">
+        <h2>Today's Metrics</h2>
+        <div class="metrics-grid">
+            <div class="metric-box">
+                <div>Current Price</div>
+                <div class="value" id="currentPrice">--</div>
+            </div>
+            <div class="metric-box">
+                <div>Volatility</div>
+                <div class="value" id="volatility">--</div>
+            </div>
+            <div class="metric-box">
+                <div>Trend</div>
+                <div class="value" id="trend">--</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" id="predictionSection" style="display:none;">
+        <h2 id="predictionTitle">Forecast</h2>
+        <div class="predictions-grid" id="predictionContainer"></div>
+    </div>
+
+    <div class="card" id="newsSection" style="display:none;">
+        <h2>Latest News & Sentiment</h2>
+        <div id="newsContainer"></div>
+    </div>
+
+    <div class="card">
+        <div class="chart-wrapper">
+            <canvas id="priceChart"></canvas>
+        </div>
+    </div>
+
+</div>
+
+<script>
+const API_URL = window.location.origin + '/api';
+let chart = null;
+
+async function runPrediction() {
+    document.getElementById("loadingOverlay").style.display = "flex";
+
+    try {
+        const symbol = document.getElementById("stockSymbol").value;
+        const horizon = parseInt(document.getElementById("forecastHorizon").value);
+
+        const res = await fetch(`${API_URL}/stock/${symbol}?days=${horizon}`);
+        const data = await res.json();
+
+        if (!data.success) {
+            alert(data.error || "Failed to get data");
+            return;
+        }
+
+        const hist = data.data;
+        const last30 = hist.slice(-30);
+        const start = last30[0].close;
+        const end = last30[last30.length - 1].close;
+        const trend = end > start ? "bullish" : "bearish";
+        const mlFull = data.prediction.ml;
+        const sentFull = data.prediction.sentimentAdjusted;
+        const sentiment = data.sentiment;
+
+        const idx = horizon - 1;
+        const mlPrice = mlFull[idx];
+        const sentPrice = sentFull[idx];
+
+        updateMetrics(hist);
+        updateSinglePrediction(hist, mlPrice, sentPrice, horizon, trend);
+        updateNews(sentiment);
+        updateChart(hist, mlFull, sentFull);
+
+    } catch (err) {
+        alert("Request failed: " + err.message);
+    } finally {
+        document.getElementById("loadingOverlay").style.display = "none";
+    }
+}
+
+function updateMetrics(hist) {
+    const current = hist[hist.length-1].close;
+    document.getElementById("currentPrice").innerText = "₹" + current.toFixed(2);
+
+    const recentCloses = hist.slice(-30).map(d => d.close);
+    if (recentCloses.length < 2) {
+        document.getElementById("volatility").innerText = "N/A";
+        return;
+    }
+
+    const returns = [];
+    for (let i = 1; i < recentCloses.length; i++) {
+        returns.push((recentCloses[i] - recentCloses[i-1]) / recentCloses[i-1]);
+    }
+    const avgReturn = returns.reduce((a,b) => a+b, 0) / returns.length;
+    const variance = returns.reduce((sum, r) => sum + Math.pow(r - avgReturn, 2), 0) / (returns.length - 1);
+    const dailyVol = Math.sqrt(variance);
+    const annualizedVol = (dailyVol * Math.sqrt(252) * 100).toFixed(2) + "%";
+
+    const last30 = hist.slice(-30);
+    const s = last30[0].close;
+    const e = last30[last30.length - 1].close;
+    document.getElementById("trend").innerText = e > s ? "BULLISH" : "BEARISH";
+    document.getElementById("volatility").innerText = annualizedVol;
+}
+
+function updateSinglePrediction(hist, mlPrice, sentPrice, horizon, trend) {
+    document.getElementById("predictionSection").style.display = "block";
+    document.getElementById("predictionTitle").innerText =
+        horizon === 1 ? "Tomorrow's Forecast" :
+        horizon === 7 ? "7-Day Forecast" : "30-Day Forecast";
+
+    const current = hist[hist.length-1].close;
+
+    const recentReturns = [];
+    const closes = hist.slice(-15).map(d => d.close);
+    for (let i = 1; i < closes.length; i++) {
+        recentReturns.push(Math.abs((closes[i] - closes[i-1]) / closes[i-1]));
+    }
+    const avgDailyMove = recentReturns.length > 0 ? recentReturns.reduce((a,b)=>a+b,0) / recentReturns.length : 0.015;
+    const rangeFactor = 1.5 * avgDailyMove * Math.sqrt(horizon); // sqrt scaling = realistic confidence interval
+
+    const mlHigh = mlPrice * (1 + rangeFactor);
+    const mlLow  = mlPrice * (1 - rangeFactor);
+    const sentHigh = sentPrice * (1 + rangeFactor);
+    const sentLow  = sentPrice * (1 - rangeFactor);
+
+    const mlChangePct   = (mlPrice - current) / current * 100;
+    const sentChangePct = (sentPrice - current) / current * 100;
+    const mlChange   = mlChangePct.toFixed(2);
+    const sentChange = sentChangePct.toFixed(2);
+
+    const mlClass   = mlChangePct > 0 ? 'bullish' : 'bearish';
+    const sentClass = sentChangePct > 0 ? 'bullish' : 'bearish';
+
+    const html = `
+        <div class="pred-card ${mlClass}">
+            <h3>ML Prediction</h3>
+            <div class="price">₹${mlPrice.toFixed(2)}</div>
+            <div class="change">${mlChangePct > 0 ? '+' : ''}${mlChange}%</div>
+            <div class="range">High: ₹${mlHigh.toFixed(2)} | Low: ₹${mlLow.toFixed(2)}</div>
+        </div>
+        <div class="pred-card ${sentClass}">
+            <h3>Sentiment Adjusted</h3>
+            <div class="price">₹${sentPrice.toFixed(2)}</div>
+            <div class="change">${sentChangePct > 0 ? '+' : ''}${sentChange}%</div>
+            <div class="range">High: ₹${sentHigh.toFixed(2)} | Low: ₹${sentLow.toFixed(2)}</div>
+        </div>
+    `;
+
+    document.getElementById("predictionContainer").innerHTML = html;
+}
+
+function updateNews(sentiment) {
+    const newsSection = document.getElementById("newsSection");
+    const container = document.getElementById("newsContainer");
+    container.innerHTML = "";
+
+    if (!sentiment || sentiment.newsCount === 0) {
+        newsSection.style.display = "none";
+        return;
+    }
+
+    newsSection.style.display = "block";
+
+    sentiment.recentNews.forEach(news => {
+        const badgeClass =
+            news.sentiment.label === "positive" ? "badge-positive" :
+            news.sentiment.label === "negative" ? "badge-negative" : "badge-neutral";
+
+        const div = document.createElement("div");
+        div.className = "news-card";
+        div.innerHTML = `
+            <div class="news-title">
+                <a href="${news.url}" target="_blank">${news.title}</a>
+            </div>
+            <div class="news-meta">
+                ${news.source} • ${new Date(news.publishedAt).toLocaleDateString()}
+            </div>
+            <p style="font-size:0.9rem; margin-top:6px; color:var(--color-text-light);">${news.description || ""}</p>
+            <span class="sentiment-badge ${badgeClass}">
+                ${news.sentiment.label.toUpperCase()}
+            </span>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function updateChart(hist, mlFull, sentFull) {
+    const ctx = document.getElementById("priceChart").getContext("2d");
+
+    // Only show last 30 days of history on the chart
+    const hist30    = hist.slice(-30);
+    const histDates  = hist30.map(d => d.date);
+    const histPrices = hist30.map(d => d.close);
+
+    // Generate future dates from last historical date.
+    // Use local date parts (not new Date(string)) so .getDay() is correct in all timezones.
+    let futureDates = [];
+    const [ly, lm, ld] = histDates[histDates.length - 1].split('-').map(Number);
+    let lastDate = new Date(ly, lm - 1, ld);
+
+    for (let i = 0; i < mlFull.length; i++) {
+        lastDate.setDate(lastDate.getDate() + 1);
+        while (lastDate.getDay() === 0 || lastDate.getDay() === 6) {
+            lastDate.setDate(lastDate.getDate() + 1);
+        }
+        const yy = lastDate.getFullYear();
+        const mm = String(lastDate.getMonth() + 1).padStart(2, '0');
+        const dd = String(lastDate.getDate()).padStart(2, '0');
+        futureDates.push(yy + '-' + mm + '-' + dd);
+    }
+
+    if (chart) chart.destroy();
+
+    // Labels: 30 historical dates + future dates (the last hist date is shared as anchor)
+    const allLabels = [...histDates, ...futureDates];
+
+    chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: allLabels,
+            datasets: [
+                {
+                    label: 'Historical Price',
+                    data: histPrices,
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointHoverRadius: 7,
+                    pointBackgroundColor: '#2563eb',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    borderWidth: 2
+                },
+                {
+                    label: 'ML Forecast',
+                    // Anchor forecast to the last historical price so the line starts exactly there
+                    data: [...Array(hist30.length - 1).fill(null), histPrices[histPrices.length - 1], ...mlFull],
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'rgba(245, 158, 11, 0.08)',
+                    borderDash: [5, 5],
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointHoverRadius: 7,
+                    pointBackgroundColor: '#f59e0b',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    borderWidth: 3
+                },
+                {
+                    label: 'Sentiment Adjusted',
+                    // Same anchor for sentiment line
+                    data: [...Array(hist30.length - 1).fill(null), histPrices[histPrices.length - 1], ...sentFull],
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                    borderDash: [3, 3],
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointHoverRadius: 7,
+                    pointBackgroundColor: '#10b981',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    borderWidth: 3
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        font: { size: window.innerWidth < 768 ? 12 : 13, weight: '600' },
+                        usePointStyle: true,
+                        padding: 15
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) label += ': ';
+                            if (context.parsed.y !== null) {
+                                label += '₹' + context.parsed.y.toFixed(2);
+                            }
+                            return label;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: {
+                        maxRotation: 45,
+                        minRotation: 45,
+                        font: { size: window.innerWidth < 768 ? 10 : 12 },
+                        autoSkip: true,
+                        maxTicksLimit: window.innerWidth < 768 ? 6 : 15
+                    }
+                },
+                y: {
+                    beginAtZero: false,
+                    grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                    ticks: {
+                        font: { size: window.innerWidth < 768 ? 11 : 12 },
+                        callback: value => '₹' + value.toFixed(0)
+                    }
+                }
+            }
+        }
+    });
+}
+</script>
+
+</body>
+</html>
