@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NutriCalc Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--teal:#0d9e7e;--teal2:#0a7d63;--teal3:#e6f7f3;--rose:#f43f5e;--amber:#f59e0b;--sky:#0ea5e9;--ink:#0f172a;--ink2:#334155;--muted:#64748b;--border:#e2e8f0;--bg:#f1f5f9;--white:#fff}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:99;height:56px;background:var(--ink);display:flex;align-items:center;justify-content:space-between;padding:0 20px;gap:10px}
+.brand{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#fff;display:flex;align-items:center;gap:8px}
+.abadge{background:var(--amber);color:#000;font-size:9px;font-weight:700;padding:2px 6px;border-radius:20px;letter-spacing:.5px}
+.nright{display:flex;align-items:center;gap:8px}
+.nname{font-size:12px;color:#cbd5e1;font-weight:500}
+.nemail{font-size:10px;color:#475569}
+.nbtn{padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif}
+.nbtn-g{background:var(--teal);color:#fff}.nbtn-g:hover{background:var(--teal2)}
+.nbtn-o{background:transparent;color:#94a3b8;border:1px solid #334155}.nbtn-o:hover{color:var(--rose);border-color:var(--rose)}
+/* LAYOUT */
+.wrap{display:flex;margin-top:56px;height:calc(100vh - 56px)}
+/* SIDEBAR */
+.sb{width:280px;flex-shrink:0;background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.sb-top{padding:12px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:8px}
+.sb-title{font-family:'Syne',sans-serif;font-size:12px;font-weight:700}
+.sb-search{width:100%;padding:6px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:12px;font-family:'DM Sans',sans-serif;outline:none}
+.sb-search:focus{border-color:var(--teal)}
+.frow{display:flex;gap:4px}
+.fb{flex:1;padding:4px 2px;border:1.5px solid var(--border);border-radius:5px;font-size:10px;font-weight:600;cursor:pointer;background:var(--white);color:var(--muted);font-family:'DM Sans',sans-serif}
+.fb.on{border-color:var(--teal);background:var(--teal3);color:var(--teal)}
+.ulist{flex:1;overflow-y:auto}
+.uitem{padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .1s}
+.uitem:hover{background:#f8fafc}
+.uitem.sel{background:var(--teal3);border-left:3px solid var(--teal)}
+.uav{width:32px;height:32px;border-radius:50%;background:var(--teal3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--teal);flex-shrink:0}
+.uinfo{flex:1;min-width:0}
+.uname{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.uemail{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bdg{display:inline-flex;padding:2px 7px;border-radius:20px;font-size:9px;font-weight:700;white-space:nowrap}
+.b-active{background:#dcfce7;color:#166534}
+.b-restricted{background:#fee2e2;color:#991b1b}
+.b-inactive{background:#fef3c7;color:#92400e}
+.sb-empty{padding:24px;text-align:center;color:var(--muted);font-size:12px}
+/* MAIN */
+.main{flex:1;padding:20px;overflow-y:auto}
+.srow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+.sc{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.slbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:5px}
+.sval{font-family:'Syne',sans-serif;font-size:26px;font-weight:800}
+.sky{color:var(--sky)}.steal{color:var(--teal)}.samb{color:var(--amber)}.srose{color:var(--rose)}
+/* DETAIL */
+.empty-state{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:50px 20px;text-align:center;color:var(--muted)}
+.empty-state div{font-size:36px;margin-bottom:10px}
+.dcard{background:var(--white);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.dhead{padding:16px 20px;background:linear-gradient(135deg,#0f172a,#1e293b);display:flex;align-items:center;gap:12px}
+.dav{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:#fff;flex-shrink:0}
+.dname{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#fff}
+.demail{font-size:11px;color:#94a3b8;margin-top:2px}
+.dlogin{font-size:10px;color:#64748b;margin-top:3px}
+.dbody{padding:16px 20px}
+.dsec{margin-bottom:16px}
+.dsec-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.dgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.df{background:#f8fafc;border:1px solid var(--border);border-radius:7px;padding:8px 10px}
+.dfl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:2px}
+.dfv{font-size:13px;font-weight:600}
+.crow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.cb{border-radius:7px;padding:10px;text-align:center}
+.cb-m{background:#f0fdf4;border:1px solid #bbf7d0}
+.cb-t{background:var(--teal3);border:1px solid #6ee7d0}
+.cb-g{background:#eff6ff;border:1px solid #bfdbfe}
+.cbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:3px}
+.cbv{font-family:'Syne',sans-serif;font-size:20px;font-weight:800}
+.cb-m .cbv{color:#166534}.cb-t .cbv{color:var(--teal)}.cb-g .cbv{font-size:12px;color:#1d4ed8;margin-top:4px}
+.cbu{font-size:9px;color:var(--muted);margin-top:2px}
+.warn-box{background:#fef3c7;border:1px solid #fde68a;border-radius:7px;padding:10px 14px;font-size:12px;color:#92400e}
+/* ACTIONS */
+.abar{display:flex;gap:6px;flex-wrap:wrap;padding:12px 20px;border-top:1px solid var(--border);background:#f8fafc;align-items:center}
+.abtn{padding:7px 14px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:5px}
+.ab-res{background:#fee2e2;color:#991b1b}.ab-res:hover{background:#fca5a5}
+.ab-rea{background:#dcfce7;color:#166534}.ab-rea:hover{background:#86efac}
+.ab-del{background:#f1f5f9;color:var(--rose);margin-left:auto}.ab-del:hover{background:#fee2e2}
+/* MEALS */
+.mtog{padding:12px 20px;border-top:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:background .1s}
+.mtog:hover{background:#f8fafc}
+.mtog-lbl{font-size:12px;font-weight:600;color:var(--ink2)}
+.mcont{display:none;padding:12px 20px;border-top:1px solid var(--border)}
+.mcont.open{display:block}
+.dblock{margin-bottom:8px;background:#f8fafc;border:1px solid var(--border);border-radius:7px;overflow:hidden}
+.dlbl{padding:6px 10px;background:#f1f5f9;font-family:'Syne',sans-serif;font-size:10px;font-weight:700;color:var(--ink2);border-bottom:1px solid var(--border)}
+.dmeals{display:grid;grid-template-columns:repeat(3,1fr)}
+.mc{padding:7px 9px;border-right:1px solid var(--border)}
+.mc:last-child{border-right:none}
+.mt{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:2px}
+.mn{font-size:11px;font-weight:500;line-height:1.3}
+.mk{font-size:10px;color:var(--teal);margin-top:2px}
+.no-meals{text-align:center;padding:20px;color:var(--muted);font-size:12px}
+/* MODAL */
+.mover{display:none;position:fixed;inset:0;z-index:300;background:rgba(15,23,42,.5);backdrop-filter:blur(3px);align-items:center;justify-content:center;padding:20px}
+.mover.open{display:flex}
+.mbox{background:var(--white);border-radius:12px;width:100%;max-width:440px;overflow:hidden;box-shadow:0 16px 48px rgba(0,0,0,.2)}
+.mhd{padding:14px 20px;background:var(--ink);display:flex;align-items:center;justify-content:space-between}
+.mhd h3{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#fff}
+.mclose{background:none;border:none;color:#94a3b8;font-size:18px;cursor:pointer}.mclose:hover{color:#fff}
+.mbody{padding:20px}
+.fld{margin-bottom:12px}
+.flbl{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--ink2);margin-bottom:4px}
+.finp{width:100%;padding:8px 11px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--ink);outline:none}
+.finp:focus{border-color:var(--teal)}
+.fhint{font-size:10px;color:var(--muted);margin-top:3px}
+.fmsg{font-size:11px;text-align:center;margin-top:6px;min-height:14px}
+.fmsg.err{color:var(--rose)}.fmsg.ok{color:var(--teal)}
+.mft{display:flex;gap:8px;justify-content:flex-end;padding:12px 20px;border-top:1px solid var(--border);background:#f8fafc}
+.bok{padding:7px 16px;background:var(--teal);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}.bok:hover{background:var(--teal2)}
+.bcan{padding:7px 16px;background:var(--white);color:var(--muted);border:1px solid var(--border);border-radius:6px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif}.bcan:hover{color:var(--rose);border-color:var(--rose)}
+/* TOAST */
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--ink);color:#fff;padding:9px 18px;border-radius:30px;font-size:12px;font-weight:500;transition:transform .3s;z-index:400;pointer-events:none}
+#toast.show{transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<nav>
+  <div class="brand">NutriCalc <span class="abadge">ADMIN</span></div>
+  <div class="nright">
+    <div><div class="nname" id="aname"></div><div class="nemail" id="aemail"></div></div>
+    <button class="nbtn nbtn-g" onclick="openAddAdmin()">+ Add Admin</button>
+    <button class="nbtn nbtn-o" onclick="doLogout()">Sign out</button>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="sb">
+    <div class="sb-top">
+      <div class="sb-title">Users <span id="ucount" style="color:var(--muted);font-weight:400;font-size:11px"></span></div>
+      <input class="sb-search" type="text" placeholder="Search name or email..." oninput="doSearch(this.value)">
+      <div class="frow">
+        <button class="fb on" onclick="doFilter('all',this)">All</button>
+        <button class="fb" onclick="doFilter('active',this)">Active</button>
+        <button class="fb" onclick="doFilter('inactive',this)">Inactive</button>
+        <button class="fb" onclick="doFilter('restricted',this)">Restricted</button>
+      </div>
+    </div>
+    <div class="ulist" id="ulist"><div class="sb-empty">Loading...</div></div>
+  </div>
+
+  <div class="main">
+    <div class="srow">
+      <div class="sc"><div class="slbl">Total</div><div class="sval sky" id="st">—</div></div>
+      <div class="sc"><div class="slbl">Active</div><div class="sval steal" id="sa">—</div></div>
+      <div class="sc"><div class="slbl">Inactive</div><div class="sval samb" id="si">—</div></div>
+      <div class="sc"><div class="slbl">Restricted</div><div class="sval srose" id="sr">—</div></div>
+    </div>
+    <div id="detail">
+      <div class="empty-state"><div>👈</div><p>Select a user to view details</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD ADMIN MODAL -->
+<div id="modal" class="mover">
+  <div class="mbox">
+    <div class="mhd"><h3>Add New Admin</h3><button class="mclose" onclick="closeModal()">✕</button></div>
+    <div class="mbody">
+      <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:7px;padding:9px 12px;font-size:11px;color:#0369a1;margin-bottom:14px">
+        Email must end with <strong>@nutricalc.com</strong>
+      </div>
+      <div class="fld"><label class="flbl">Full Name</label><input class="finp" id="mn" type="text" placeholder="e.g. Rahul Singh"></div>
+      <div class="fld"><label class="flbl">Email</label><input class="finp" id="me" type="email" placeholder="rahul@nutricalc.com" oninput="checkEmail(this)"><div class="fhint" id="meh">Must end with @nutricalc.com</div></div>
+      <div class="fld"><label class="flbl">Password</label><input class="finp" id="mp" type="password" placeholder="Min. 8 characters"></div>
+      <div class="fmsg" id="mm"></div>
+    </div>
+    <div class="mft"><button class="bcan" onclick="closeModal()">Cancel</button><button class="bok" onclick="submitAdmin()">Create Admin</button></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+var allUsers = [];
+var curFilter = 'all';
+var curSearch = '';
+var selUid = null;
+
+function _(id){ return document.getElementById(id); }
+
+function toast(msg){
+  var t = _('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2500);
+}
+
+function req(path, method, body){
+  var opts = { method: method || 'GET', credentials: 'include', headers: { 'Content-Type': 'application/json' } };
+  if(body) opts.body = JSON.stringify(body);
+  return fetch(path, opts).then(function(r){ return r.json().then(function(d){ return { ok: r.ok, data: d }; }); }).catch(function(){ return { ok: false, data: { message: '' } }; });
+}
+
+// AUTH CHECK
+req('/api/profile').then(function(res){
+  if(!res.ok || !res.data.is_admin){
+    document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:100vh"><div style="text-align:center;font-family:sans-serif"><div style="font-size:48px">🔒</div><h2 style="margin:12px 0 8px">Access Denied</h2><p style="color:#64748b;margin-bottom:20px">Please log in as admin</p><a href="/" style="padding:9px 20px;background:#0d9e7e;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">Go to Login</a></div></div>';
+    return;
+  }
+  _('aname').textContent = res.data.name;
+  _('aemail').textContent = res.data.email;
+  loadUsers();
+});
+
+function doLogout(){
+  req('/api/logout', 'POST').then(function(){ window.location.replace('/'); });
+}
+
+function loadUsers(){
+  req('/api/admin/users').then(function(res){
+    if(!res.ok) return;
+    allUsers = res.data;
+    _('st').textContent = allUsers.length;
+    _('sa').textContent = allUsers.filter(function(u){ return u.status==='active'; }).length;
+    _('si').textContent = allUsers.filter(function(u){ return u.status==='inactive'; }).length;
+    _('sr').textContent = allUsers.filter(function(u){ return u.status==='restricted'; }).length;
+    renderList();
+  });
+}
+
+function doFilter(f, btn){
+  curFilter = f;
+  document.querySelectorAll('.fb').forEach(function(b){ b.classList.remove('on'); });
+  btn.classList.add('on');
+  renderList();
+}
+
+function doSearch(q){ curSearch = q; renderList(); }
+
+function renderList(){
+  var list = allUsers;
+  if(curFilter !== 'all') list = list.filter(function(u){ return u.status === curFilter; });
+  if(curSearch){
+    var q = curSearch.toLowerCase();
+    list = list.filter(function(u){ return u.full_name.toLowerCase().indexOf(q)>=0 || u.email.toLowerCase().indexOf(q)>=0; });
+  }
+  _('ucount').textContent = '(' + list.length + ')';
+  if(!list.length){ _('ulist').innerHTML = '<div class="sb-empty">No users found</div>'; return; }
+  var html = '';
+  for(var i=0;i<list.length;i++){
+    var u = list[i];
+    var sel = u.user_id === selUid ? ' sel' : '';
+    var status = u.status.charAt(0).toUpperCase() + u.status.slice(1);
+    html += '<div class="uitem' + sel + '" onclick="selectUser(' + u.user_id + ')">'
+      + '<div class="uav">' + u.full_name.charAt(0).toUpperCase() + '</div>'
+      + '<div class="uinfo"><div class="uname">' + u.full_name + '</div><div class="uemail">' + u.email + '</div></div>'
+      + '<span class="bdg b-' + u.status + '">' + status + '</span>'
+      + '</div>';
+  }
+  _('ulist').innerHTML = html;
+}
+
+function selectUser(uid){
+  selUid = uid;
+  renderList();
+  _('detail').innerHTML = '<div class="dcard"><div style="padding:40px;text-align:center;color:#64748b">Loading...</div></div>';
+  Promise.all([
+    req('/api/admin/users/' + uid),
+    req('/api/admin/users/' + uid + '/meal-plan')
+  ]).then(function(results){
+    var ures = results[0], mres = results[1];
+    if(!ures.ok){ _('detail').innerHTML = '<div class="dcard"><div style="padding:40px;text-align:center;color:#f43f5e">Failed to load user.</div></div>'; return; }
+    renderDetail(ures.data, mres.ok ? mres.data : []);
+  });
+}
+
+function renderDetail(u, meals){
+  var initials = u.full_name.split(' ').map(function(w){ return w[0]; }).join('').toUpperCase().slice(0,2);
+  var status = u.status.charAt(0).toUpperCase() + u.status.slice(1);
+  var hasProfile = u.age !== null && u.age !== undefined;
+
+  // ACTION BUTTONS
+  var abtns = '';
+  if(u.status === 'restricted'){
+    abtns += '<button class="abtn ab-rea" onclick="doReactivate(' + u.user_id + ',\'' + u.full_name.replace(/'/g,"\\'") + '\')">✅ Reactivate</button>';
+  } else {
+    abtns += '<button class="abtn ab-res" onclick="doRestrict(' + u.user_id + ',\'' + u.full_name.replace(/'/g,"\\'") + '\')">🚫 Restrict</button>';
+  }
+  if(u.status === 'inactive'){
+    abtns += '<button class="abtn ab-rea" onclick="doReactivate(' + u.user_id + ',\'' + u.full_name.replace(/'/g,"\\'") + '\')">✅ Reactivate</button>';
+  }
+  abtns += '<button class="abtn ab-del" onclick="doDelete(' + u.user_id + ',\'' + u.full_name.replace(/'/g,"\\'") + '\')">🗑 Delete</button>';
+
+  // PROFILE SECTION
+  var profileHtml = '';
+  if(hasProfile){
+    profileHtml = '<div class="dsec">'
+      + '<div class="dsec-title">Personal Details</div>'
+      + '<div class="dgrid">'
+      + '<div class="df"><div class="dfl">Age</div><div class="dfv">' + u.age + ' yrs</div></div>'
+      + '<div class="df"><div class="dfl">Gender</div><div class="dfv">' + (u.gender||'—') + '</div></div>'
+      + '<div class="df"><div class="dfl">Height</div><div class="dfv">' + (u.height||'—') + ' cm</div></div>'
+      + '<div class="df"><div class="dfl">Weight</div><div class="dfv">' + (u.weight||'—') + ' kg</div></div>'
+      + '<div class="df"><div class="dfl">Activity</div><div class="dfv" style="font-size:11px">' + (u.activity_level||'—') + '</div></div>'
+      + '<div class="df"><div class="dfl">Goal</div><div class="dfv" style="font-size:11px">' + (u.body_goal||'—') + '</div></div>'
+      + '</div></div>'
+      + '<div class="dsec">'
+      + '<div class="dsec-title">Calorie Targets</div>'
+      + '<div class="crow">'
+      + '<div class="cb cb-m"><div class="cbl">Maintenance</div><div class="cbv">' + Math.round(u.maintenance_calories||0) + '</div><div class="cbu">kcal/day</div></div>'
+      + '<div class="cb cb-t"><div class="cbl">Daily Target</div><div class="cbv">' + Math.round(u.target_calories||0) + '</div><div class="cbu">kcal/day</div></div>'
+      + '<div class="cb cb-g"><div class="cbl">Goal</div><div class="cbv">' + (u.body_goal||'—') + '</div><div class="cbu">&nbsp;</div></div>'
+      + '</div></div>';
+  } else {
+    profileHtml = '<div class="dsec"><div class="warn-box">⚠️ This user has not filled in their profile yet.</div></div>';
+  }
+
+  // MEALS
+  var mealsHtml = '';
+  if(meals && meals.length){
+    for(var i=0;i<meals.length;i++){
+      var d = meals[i];
+      mealsHtml += '<div class="dblock">'
+        + '<div class="dlbl">' + d.day + ' · ' + Math.round(d.total_calories||0) + ' kcal</div>'
+        + '<div class="dmeals">'
+        + '<div class="mc"><div class="mt">Breakfast</div><div class="mn">' + (d.breakfast.name||'—') + '</div><div class="mk">' + Math.round(d.breakfast.calories||0) + ' kcal</div></div>'
+        + '<div class="mc"><div class="mt">Lunch</div><div class="mn">' + (d.lunch.name||'—') + '</div><div class="mk">' + Math.round(d.lunch.calories||0) + ' kcal</div></div>'
+        + '<div class="mc"><div class="mt">Dinner</div><div class="mn">' + (d.dinner.name||'—') + '</div><div class="mk">' + Math.round(d.dinner.calories||0) + ' kcal</div></div>'
+        + '</div></div>';
+    }
+  } else {
+    mealsHtml = '<div class="no-meals">No meal plan generated yet</div>';
+  }
+  var mealLabel = (meals && meals.length) ? '7 days' : 'no plan yet';
+
+  var html = '<div class="dcard">'
+    + '<div class="dhead">'
+    + '<div class="dav">' + initials + '</div>'
+    + '<div style="flex:1"><div class="dname">' + u.full_name + '</div><div class="demail">' + u.email + '</div><div class="dlogin">Last login: ' + u.last_login + '</div></div>'
+    + '<span class="bdg b-' + u.status + '" style="font-size:10px;padding:3px 10px">' + status + '</span>'
+    + '</div>'
+    + '<div class="dbody">' + profileHtml + '</div>'
+    + '<div class="abar">' + abtns + '</div>'
+    + '<div class="mtog" onclick="toggleMeals(this)"><span class="mtog-lbl">📋 Weekly Meal Plan (' + mealLabel + ')</span><span style="color:var(--muted)">▼</span></div>'
+    + '<div class="mcont">' + mealsHtml + '</div>'
+    + '</div>';
+
+  _('detail').innerHTML = html;
+}
+
+function toggleMeals(btn){
+  var c = btn.nextElementSibling;
+  var open = c.classList.toggle('open');
+  btn.querySelector('span:last-child').textContent = open ? '▲' : '▼';
+}
+
+function doRestrict(uid, name){
+  if(!confirm('Restrict ' + name + '?\nThey will not be able to log in.')) return;
+  req('/api/admin/users/' + uid + '/restrict', 'POST').then(function(res){
+    if(!res.ok){ toast('Failed: ' + (res.data.message||'error')); return; }
+    toast('🚫 ' + name + ' restricted');
+    loadUsers();
+    selectUser(uid);
+  });
+}
+function doReactivate(uid, name){
+  req('/api/admin/users/' + uid + '/reactivate', 'POST').then(function(res){
+    if(!res.ok){ toast('Failed: ' + (res.data.message||'error')); return; }
+    toast('✅ ' + name + ' reactivated');
+    loadUsers();
+    selectUser(uid);
+  });
+}
+function doDelete(uid, name){
+  if(!confirm('Permanently delete ' + name + '?\nThis cannot be undone.')) return;
+  req('/api/admin/users/' + uid + '/delete', 'POST').then(function(res){
+    if(!res.ok){ toast('Failed: ' + (res.data.message||'error')); return; }
+    toast('🗑 ' + name + ' deleted');
+    selUid = null;
+    _('detail').innerHTML = '<div class="empty-state"><div>👈</div><p>Select a user to view details</p></div>';
+    loadUsers();
+  });
+}
+
+// ADD ADMIN
+function openAddAdmin(){
+  _('mn').value=''; _('me').value=''; _('mp').value=''; _('mm').textContent='';
+  _('meh').style.color='var(--muted)'; _('meh').textContent='Must end with @nutricalc.com';
+  _('modal').classList.add('open');
+}
+function closeModal(){ _('modal').classList.remove('open'); }
+function checkEmail(input){
+  var h = _('meh');
+  if(!input.value){ h.style.color='var(--muted)'; h.textContent='Must end with @nutricalc.com'; return; }
+  if(input.value.indexOf('@nutricalc.com', input.value.length - '@nutricalc.com'.length) !== -1){
+    h.style.color='var(--teal)'; h.textContent='✓ Valid';
+  } else {
+    h.style.color='var(--rose)'; h.textContent='✗ Must end with @nutricalc.com';
+  }
+}
+function submitAdmin(){
+  var name = _('mn').value.trim(), email = _('me').value.trim(), pass = _('mp').value;
+  var msg = _('mm');
+  if(!name||!email||!pass){ msg.className='fmsg err'; msg.textContent='All fields required.'; return; }
+  if(email.indexOf('@nutricalc.com', email.length - '@nutricalc.com'.length) === -1){ msg.className='fmsg err'; msg.textContent='Email must end with @nutricalc.com'; return; }
+  if(pass.length < 8){ msg.className='fmsg err'; msg.textContent='Password min. 8 characters.'; return; }
+  req('/api/admin/add-admin', 'POST', { full_name: name, email: email, password: pass }).then(function(res){
+    if(!res.ok){ msg.className='fmsg err'; msg.textContent = res.data.message||'Failed.'; return; }
+    msg.className='fmsg ok'; msg.textContent = res.data.message;
+    toast('✅ Admin ' + name + ' created!');
+    setTimeout(closeModal, 1200);
+  });
+}
+</script>
+</body>
+</html>
