@@ -1,0 +1,5 @@
+D:\Windroid\windows-server\MediaBridge\obj\Release\net8.0\win-x64\MediaBridge.GeneratedMSBuildEditorConfig.editorconfig
+D:\Windroid\windows-server\MediaBridge\obj\Release\net8.0\win-x64\MediaBridge.AssemblyInfoInputs.cache
+D:\Windroid\windows-server\MediaBridge\obj\Release\net8.0\win-x64\MediaBridge.AssemblyInfo.cs
+D:\Windroid\windows-server\MediaBridge\obj\Release\net8.0\win-x64\MediaBridge.csproj.CoreCompileInputs.cache
+D:\Windroid\windows-server\MediaBridge\obj\Release\net8.0\win-x64\MediaBridge.sourcelink.json

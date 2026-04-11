@@ -1,0 +1,422 @@
+[
+  {
+    "timestamp": "2026-03-12 08:48:53",
+    "severity": "SUSPICIOUS",
+    "score": -0.0263,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-12 08:26:05",
+    "severity": "SUSPICIOUS",
+    "score": -0.0263,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 23:33:07",
+    "severity": "SUSPICIOUS",
+    "score": -0.0263,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 22:53:56",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 22:42:15",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 22:40:11",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 22:34:58",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 22:34:24",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 22:23:50",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 22:18:04",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 22:13:40",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 21:39:17",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 21:38:52",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 21:33:40",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 21:26:18",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 21:25:45",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 21:15:49",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 21:08:30",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 21:08:30",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 21:08:05",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 21:08:05",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 21:04:01",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 20:58:44",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 20:58:44",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 20:57:04",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 20:57:04",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 20:56:36",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 20:56:36",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 20:43:44",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 20:43:44",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 20:43:12",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 20:43:12",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 20:23:30",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 20:23:30",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 20:22:35",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 20:22:35",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 20:22:10",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 20:22:10",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 20:14:49",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 20:14:49",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 20:14:23",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 20:14:23",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 19:56:52",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 19:56:52",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 19:49:48",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 19:49:48",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 19:48:00",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 19:48:00",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 19:42:27",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 19:42:27",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 19:41:40",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 19:41:40",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 19:33:42",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 19:33:42",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 19:32:48",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 19:32:48",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 19:16:39",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 19:16:39",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 19:15:41",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 19:15:41",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 19:11:08",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 19:11:08",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 16:19:39",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 16:19:39",
+    "severity": "SUSPICIOUS",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 16:17:54",
+    "severity": "MEDIUM",
+    "score": -0.019,
+    "reason": "inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 16:17:54",
+    "severity": "MEDIUM",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 16:17:12",
+    "severity": "MEDIUM",
+    "score": -0.019,
+    "reason": "inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 16:17:12",
+    "severity": "MEDIUM",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 16:09:50",
+    "severity": "MEDIUM",
+    "score": -0.019,
+    "reason": "inactive user"
+  },
+  {
+    "timestamp": "2026-03-11 16:09:50",
+    "severity": "MEDIUM",
+    "score": -0.019,
+    "reason": "Night-time activity with inactive user"
+  }
+]

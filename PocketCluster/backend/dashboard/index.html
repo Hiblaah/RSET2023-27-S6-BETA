@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PocketCluster Admin Dashboard — Monitor devices, files, users, and replication status in your decentralized storage cluster.">
+    <title>PocketCluster — Admin Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <!-- ─── Header ─────────────────────────────────────────── -->
+    <header class="header" id="header">
+        <div class="header__logo">
+            <div class="header__icon">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="24" cy="24" r="6" fill="#00e5c7"/>
+                    <circle cx="24" cy="8" r="4" fill="#00e5c7" opacity="0.8"/>
+                    <circle cx="24" cy="40" r="4" fill="#00e5c7" opacity="0.8"/>
+                    <circle cx="8" cy="24" r="4" fill="#00e5c7" opacity="0.8"/>
+                    <circle cx="40" cy="24" r="4" fill="#00e5c7" opacity="0.8"/>
+                    <circle cx="12" cy="12" r="3" fill="#00e5c7" opacity="0.6"/>
+                    <circle cx="36" cy="12" r="3" fill="#00e5c7" opacity="0.6"/>
+                    <circle cx="12" cy="36" r="3" fill="#00e5c7" opacity="0.6"/>
+                    <circle cx="36" cy="36" r="3" fill="#00e5c7" opacity="0.6"/>
+                    <line x1="24" y1="18" x2="24" y2="12" stroke="#00e5c7" stroke-width="1.5" opacity="0.5"/>
+                    <line x1="24" y1="30" x2="24" y2="36" stroke="#00e5c7" stroke-width="1.5" opacity="0.5"/>
+                    <line x1="18" y1="24" x2="12" y2="24" stroke="#00e5c7" stroke-width="1.5" opacity="0.5"/>
+                    <line x1="30" y1="24" x2="36" y2="24" stroke="#00e5c7" stroke-width="1.5" opacity="0.5"/>
+                    <line x1="20" y1="20" x2="15" y2="15" stroke="#00e5c7" stroke-width="1" opacity="0.4"/>
+                    <line x1="28" y1="20" x2="33" y2="15" stroke="#00e5c7" stroke-width="1" opacity="0.4"/>
+                    <line x1="20" y1="28" x2="15" y2="33" stroke="#00e5c7" stroke-width="1" opacity="0.4"/>
+                    <line x1="28" y1="28" x2="33" y2="33" stroke="#00e5c7" stroke-width="1" opacity="0.4"/>
+                </svg>
+            </div>
+            <div>
+                <h1>PocketCluster</h1>
+                <span class="header__subtitle">Admin Dashboard</span>
+            </div>
+        </div>
+        <div class="header__status" id="connection-status">
+            <span class="pulse"></span>
+            <span class="header__status-text">Connecting…</span>
+        </div>
+    </header>
+
+    <!-- ─── Overview Cards ─────────────────────────────────── -->
+    <section class="section" id="overview-section">
+        <h2 class="section__title">Cluster Overview</h2>
+        <div class="cards" id="overview-cards">
+            <div class="card card--accent" id="card-users">
+                <div class="card__icon"><i data-lucide="users"></i></div>
+                <div class="card__value" data-target="0">0</div>
+                <div class="card__label">Total Users</div>
+            </div>
+            <div class="card card--cyan" id="card-devices">
+                <div class="card__icon"><i data-lucide="smartphone"></i></div>
+                <div class="card__value" data-target="0">0</div>
+                <div class="card__label">Total Devices</div>
+            </div>
+            <div class="card card--green" id="card-online">
+                <div class="card__icon"><i data-lucide="activity"></i></div>
+                <div class="card__value" data-target="0">0</div>
+                <div class="card__label">Online Devices</div>
+            </div>
+            <div class="card card--red" id="card-offline">
+                <div class="card__icon"><i data-lucide="alert-circle"></i></div>
+                <div class="card__value" data-target="0">0</div>
+                <div class="card__label">Offline Devices</div>
+            </div>
+            <div class="card card--purple" id="card-files">
+                <div class="card__icon"><i data-lucide="folder-open"></i></div>
+                <div class="card__value" data-target="0">0</div>
+                <div class="card__label">Total Files</div>
+            </div>
+            <div class="card card--blue" id="card-chunks">
+                <div class="card__icon"><i data-lucide="blocks"></i></div>
+                <div class="card__value" data-target="0">0</div>
+                <div class="card__label">Total Replication Chunks</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ─── Storage Overview ───────────────────────────────── -->
+    <section class="section" id="storage-section">
+        <h2 class="section__title">Storage Utilization</h2>
+        <div class="storage-container">
+            <div class="storage-card">
+                <div class="storage-card__header">
+                    <div class="storage-card__icon"><i data-lucide="hard-drive"></i></div>
+                    <div class="storage-card__title">Cluster Storage Capacity</div>
+                </div>
+                <div class="storage-card__info">
+                    <div class="storage-card__value" id="storage-text">— / —</div>
+                </div>
+                <div class="storage-bar-large">
+                    <div class="storage-bar-large__fill" id="storage-fill" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ─── Analytics Dashboard ────────────────────────────── -->
+    <section class="section" id="analytics-section">
+        <h2 class="section__title">Cluster Analytics</h2>
+        <div class="charts-grid top-charts">
+            <div class="chart-card">
+                <h3 class="chart-card__title">Cluster Storage Usage</h3>
+                <div class="chart-container"><canvas id="clusterStorageChart"></canvas></div>
+            </div>
+            <div class="chart-card">
+                <h3 class="chart-card__title">Device Status</h3>
+                <div class="chart-container"><canvas id="deviceStatusChart"></canvas></div>
+            </div>
+            <div class="chart-card">
+                <h3 class="chart-card__title">Replication Health</h3>
+                <div class="chart-container"><canvas id="replicationChart"></canvas></div>
+            </div>
+        </div>
+        <div class="charts-grid bottom-charts">
+            <div class="chart-card chart-card--wide">
+                <h3 class="chart-card__title">Upload Activity</h3>
+                <div class="chart-container"><canvas id="uploadActivityChart"></canvas></div>
+            </div>
+            <div class="chart-card chart-card--wide">
+                <h3 class="chart-card__title">Node Storage Distribution</h3>
+                <div class="chart-container"><canvas id="nodeStorageChart"></canvas></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ─── Devices ────────────────────────────────────────── -->
+    <section class="section" id="devices-section">
+        <h2 class="section__title">
+            Devices
+            <span class="badge" id="device-count-badge">0</span>
+        </h2>
+        <div class="table-wrap">
+            <table class="table" id="devices-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Status</th>
+                        <th>Mode</th>
+                        <th>Storage</th>
+                        <th>Last Heartbeat</th>
+                    </tr>
+                </thead>
+                <tbody id="devices-tbody"></tbody>
+            </table>
+            <div class="empty-state" id="devices-empty" style="display:none;">No devices registered yet.</div>
+        </div>
+    </section>
+
+    <!-- ─── Files ──────────────────────────────────────────── -->
+    <section class="section" id="files-section">
+        <h2 class="section__title">
+            Files
+            <span class="badge" id="file-count-badge">0</span>
+        </h2>
+        <div class="table-wrap">
+            <table class="table" id="files-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Owner</th>
+                        <th>Size</th>
+                        <th>Chunks</th>
+                        <th>Uploaded</th>
+                    </tr>
+                </thead>
+                <tbody id="files-tbody"></tbody>
+            </table>
+            <div class="empty-state" id="files-empty" style="display:none;">No files uploaded yet.</div>
+        </div>
+    </section>
+
+    <!-- ─── Users ──────────────────────────────────────────── -->
+    <section class="section" id="users-section">
+        <h2 class="section__title">
+            Users
+            <span class="badge" id="user-count-badge">0</span>
+        </h2>
+        <div class="table-wrap">
+            <table class="table" id="users-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Email</th>
+                        <th>Files</th>
+                        <th>Joined</th>
+                        <th>Last Login</th>
+                    </tr>
+                </thead>
+                <tbody id="users-tbody"></tbody>
+            </table>
+            <div class="empty-state" id="users-empty" style="display:none;">No users registered yet.</div>
+        </div>
+    </section>
+
+    <!-- ─── Replication Health ─────────────────────────────── -->
+    <section class="section" id="replication-section">
+        <h2 class="section__title">Replication Health</h2>
+        <div class="replication-grid" id="replication-grid">
+            <div class="repl-card repl-card--active" id="repl-active">
+                <div class="repl-card__value">0</div>
+                <div class="repl-card__label">Active</div>
+            </div>
+            <div class="repl-card repl-card--replicating" id="repl-replicating">
+                <div class="repl-card__value">0</div>
+                <div class="repl-card__label">Replicating</div>
+            </div>
+            <div class="repl-card repl-card--lost" id="repl-lost">
+                <div class="repl-card__value">0</div>
+                <div class="repl-card__label">Lost</div>
+            </div>
+            <div class="repl-card repl-card--failed" id="repl-failed">
+                <div class="repl-card__value">0</div>
+                <div class="repl-card__label">Failed</div>
+            </div>
+        </div>
+        <div class="repl-bar-wrap" id="repl-bar-wrap">
+            <div class="repl-bar" id="repl-bar"></div>
+        </div>
+    </section>
+
+    <!-- ─── Footer ─────────────────────────────────────────── -->
+    <footer class="footer">
+        <span>PocketCluster &copy; 2026 &bull; Decentralized Personal Storage</span>
+        <span id="last-refresh">Last refresh: —</span>
+    </footer>
+
+    <script src="app.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

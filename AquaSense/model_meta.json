@@ -1,0 +1,14 @@
+{
+  "features": [
+    "pH",
+    "Temperature",
+    "Conductivity",
+    "DO",
+    "Nitrate"
+  ],
+  "use_log": true,
+  "model_type": "RandomForest",
+  "r2_score": 0.7108,
+  "rmse": 1.7979,
+  "mae": 1.0855
+}

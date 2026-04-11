@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NutriCalc — Smart Meal Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --teal:     #0d9e7e;
+  --teal-d:   #0a7d63;
+  --teal-l:   #e6f7f3;
+  --teal-ll:  #f0faf7;
+  --amber:    #f59e0b;
+  --rose:     #f43f5e;
+  --purple:   #8b5cf6;
+  --sky:      #0ea5e9;
+  --ink:      #0f172a;
+  --ink2:     #334155;
+  --muted:    #64748b;
+  --border:   #e2e8f0;
+  --bg:       #f8fafc;
+  --white:    #ffffff;
+  --r:        12px;
+  --sh:       0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.06);
+  --sh-s:     0 1px 2px rgba(0,0,0,.06);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
+
+/* ── VIEWS ── */
+.view { display: none; min-height: 100vh; }
+.view.active { display: flex; }
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: 60px; background: var(--white);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 28px;
+}
+.nav-brand { font-family: 'Syne', sans-serif; font-size: 19px; font-weight: 800; color: var(--teal); letter-spacing: -.3px; }
+.nav-right { display: flex; align-items: center; gap: 10px; }
+.nav-name { font-size: 14px; font-weight: 500; color: var(--ink2); }
+.btn-sm {
+  padding: 6px 14px; border: 1px solid var(--border); border-radius: 8px;
+  background: var(--white); font-family: 'DM Sans', sans-serif;
+  font-size: 13px; color: var(--muted); cursor: pointer; transition: all .15s;
+}
+.btn-sm:hover { border-color: var(--rose); color: var(--rose); }
+
+/* ── AUTH ── */
+#view-auth { flex-direction: row; }
+.auth-left {
+  flex: 1.1;
+  background: linear-gradient(150deg, #065f46 0%, #0d9e7e 55%, #34d399 100%);
+  padding: 64px 56px; display: flex; flex-direction: column; justify-content: center;
+  position: relative; overflow: hidden;
+}
+.auth-left::after {
+  content: '';
+  position: absolute; bottom: -80px; right: -80px;
+  width: 320px; height: 320px; border-radius: 50%;
+  background: rgba(255,255,255,.06);
+}
+.auth-left::before {
+  content: '';
+  position: absolute; top: -60px; left: -60px;
+  width: 200px; height: 200px; border-radius: 50%;
+  background: rgba(255,255,255,.04);
+}
+.auth-brand {
+  font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(255,255,255,.7); margin-bottom: 36px;
+}
+.auth-left h1 {
+  font-family: 'Syne', sans-serif; font-size: 44px; font-weight: 800;
+  color: var(--white); line-height: 1.1; margin-bottom: 18px;
+}
+.auth-left p { color: rgba(255,255,255,.75); line-height: 1.7; font-size: 15px; max-width: 340px; margin-bottom: 44px; }
+.steps { display: flex; flex-direction: column; gap: 14px; position: relative; z-index: 1; }
+.step { display: flex; align-items: center; gap: 14px; color: rgba(255,255,255,.9); font-size: 14px; }
+.step-num {
+  width: 28px; height: 28px; flex-shrink: 0; border-radius: 50%;
+  background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.25);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; color: var(--white);
+}
+.auth-right {
+  flex: 1; background: var(--white);
+  display: flex; align-items: center; justify-content: center; padding: 40px 48px;
+}
+.auth-box { width: 100%; max-width: 370px; }
+.auth-box h2 { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 700; margin-bottom: 4px; }
+.auth-sub { color: var(--muted); font-size: 13px; margin-bottom: 28px; }
+
+.tabs { display: flex; background: var(--bg); border-radius: 10px; padding: 4px; margin-bottom: 24px; }
+.tab {
+  flex: 1; padding: 8px; border: none; background: none;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+  color: var(--muted); cursor: pointer; border-radius: 8px; transition: all .2s;
+}
+.tab.active { background: var(--white); color: var(--teal); box-shadow: var(--sh-s); }
+
+/* ── FORM ── */
+.field { margin-bottom: 14px; }
+label { display: block; font-size: 12px; font-weight: 500; color: var(--ink2); margin-bottom: 5px; text-transform: uppercase; letter-spacing: .4px; }
+input[type="text"], input[type="email"], input[type="password"],
+input[type="number"], select {
+  width: 100%; padding: 10px 13px;
+  border: 1.5px solid var(--border); border-radius: 9px;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--ink);
+  background: var(--white); transition: border-color .15s, box-shadow .15s; outline: none;
+  -webkit-appearance: none;
+}
+input:focus, select:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,158,126,.1); }
+select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 32px; }
+.pw-wrap { position: relative; }
+.pw-toggle {
+  position: absolute; right: 11px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer; color: var(--muted); font-size: 12px; padding: 2px 4px;
+}
+.radio-group { display: flex; gap: 8px; }
+.radio-opt {
+  flex: 1; border: 1.5px solid var(--border); border-radius: 9px;
+  padding: 9px 10px; display: flex; align-items: center; gap: 7px;
+  cursor: pointer; transition: all .15s; font-size: 13px; color: var(--muted);
+}
+.radio-opt input { width: auto; margin: 0; accent-color: var(--teal); }
+.radio-opt:hover { border-color: var(--teal); color: var(--ink); }
+.radio-opt.selected { border-color: var(--teal); background: var(--teal-l); color: var(--teal); }
+
+.btn {
+  width: 100%; padding: 11px; background: var(--teal); color: var(--white);
+  border: none; border-radius: 9px; font-family: 'DM Sans', sans-serif;
+  font-size: 14px; font-weight: 500; cursor: pointer; transition: background .15s, transform .1s;
+}
+.btn:hover { background: var(--teal-d); }
+.btn:active { transform: scale(.98); }
+.btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+.btn-outline { background: var(--white); color: var(--teal); border: 1.5px solid var(--teal); }
+.btn-outline:hover { background: var(--teal-l); }
+.btn-accent { background: #f97316; }
+.btn-accent:hover { background: #ea6c0a; }
+
+.msg { font-size: 12px; margin-top: 10px; text-align: center; min-height: 16px; }
+.msg.error { color: var(--rose); }
+.msg.success { color: var(--teal); }
+
+/* ── APP SHELL ── */
+#view-app { flex-direction: column; }
+.app-body { margin-top: 60px; padding: 36px 28px; max-width: 980px; width: 100%; margin-left: auto; margin-right: auto; }
+
+.page-header { margin-bottom: 28px; }
+.page-title { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+.page-sub { color: var(--muted); font-size: 13px; }
+
+/* ── CARDS ── */
+.card {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 24px; box-shadow: var(--sh-s);
+}
+.card-title {
+  font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+  margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--border);
+  color: var(--ink2);
+}
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+
+/* ── RESULTS ── */
+.results-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 18px; }
+.result-card {
+  background: var(--white); border: 1px solid var(--border); border-radius: var(--r);
+  padding: 20px; text-align: center; box-shadow: var(--sh-s);
+}
+.result-card.highlight { border-color: var(--teal); background: var(--teal-ll); }
+.rc-label { font-size: 11px; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+.rc-value { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; color: var(--teal); }
+.rc-unit { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+.dist-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 22px; }
+.dist-card { border-radius: 10px; padding: 16px; text-align: center; }
+.dist-name { font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+.dist-kcal { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; }
+.dist-pct  { font-size: 11px; margin-top: 2px; opacity: .7; }
+.dc-b { background: #fff7ed; color: #c2540a; }
+.dc-l { background: #f0fdf4; color: #15803d; }
+.dc-d { background: #f5f3ff; color: #6d28d9; }
+.dc-s { background: #fef3c7; color: #92400e; }
+
+.adj-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 500;
+  margin-bottom: 18px;
+}
+.adj-zero { background: #fef9c3; color: #854d0e; }
+.adj-pos  { background: #dcfce7; color: #166534; }
+.adj-neg  { background: #fee2e2; color: #991b1b; }
+
+.results-actions { display: flex; gap: 12px; margin-top: 4px; }
+.results-actions .btn { max-width: 220px; }
+
+/* ── MEAL PLAN ── */
+#page-mealplan { display: none; }
+#page-results  { display: none; }
+.week-grid { display: flex; flex-direction: column; gap: 12px; }
+.day-row {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--r); overflow: hidden; box-shadow: var(--sh-s);
+}
+.day-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 18px; background: var(--bg); border-bottom: 1px solid var(--border);
+  cursor: pointer; user-select: none;
+}
+.day-name { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--ink); }
+.day-total { font-size: 13px; color: var(--teal); font-weight: 600; }
+.day-arrow { font-size: 12px; color: var(--muted); transition: transform .2s; }
+.day-arrow.open { transform: rotate(180deg); }
+.day-meals { display: grid; grid-template-columns: repeat(3,1fr); gap: 0; }
+.meal-cell {
+  padding: 14px 16px; border-right: 1px solid var(--border);
+  position: relative;
+}
+.meal-cell:last-child { border-right: none; }
+.meal-type-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .6px; margin-bottom: 6px;
+}
+.meal-food-name { font-size: 13px; font-weight: 500; color: var(--ink); line-height: 1.35; margin-bottom: 6px; }
+.meal-macros { display: flex; gap: 6px; flex-wrap: wrap; }
+.macro-pill {
+  font-size: 10px; padding: 2px 7px; border-radius: 10px; font-weight: 500;
+}
+.mp-kcal { background: #f0fdf4; color: #166534; }
+.mp-p    { background: #eff6ff; color: #1d4ed8; }
+.mp-c    { background: #fefce8; color: #854d0e; }
+.mp-f    { background: #fdf4ff; color: #7e22ce; }
+
+.meal-cell.mc-b .meal-type-label { color: #c2540a; }
+.meal-cell.mc-l .meal-type-label { color: #15803d; }
+.meal-cell.mc-d .meal-type-label { color: #6d28d9; }
+.meal-cell.mc-s .meal-type-label { color: #92400e; }
+
+.plan-loading { text-align: center; padding: 60px; color: var(--muted); font-size: 14px; }
+.plan-empty   { text-align: center; padding: 60px; color: var(--muted); }
+.plan-empty p { margin-bottom: 16px; font-size: 14px; }
+
+/* ── SPINNER / TOAST ── */
+.spinner {
+  width: 16px; height: 16px; border: 2.5px solid rgba(255,255,255,.4);
+  border-top-color: var(--white); border-radius: 50%;
+  display: inline-block; animation: spin .7s linear infinite;
+  vertical-align: middle; margin-right: 6px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+#toast {
+  position: fixed; bottom: 24px; left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--ink); color: var(--white);
+  padding: 11px 22px; border-radius: 30px;
+  font-size: 13px; font-weight: 500; transition: transform .3s; z-index: 200;
+  pointer-events: none;
+}
+#toast.show { transform: translateX(-50%) translateY(0); }
+
+/* ── FIELD HINTS ── */
+.field-hint {
+  font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.4;
+}
+.field-hint.error { color: var(--rose); }
+.field-hint.ok { color: var(--teal); }
+
+/* ── RESTRICTION NOTES ── */
+.restriction-note {
+  font-size: 12px; padding: 10px 13px; border-radius: 8px; line-height: 1.5;
+}
+.restriction-note-veg { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+.restriction-note-nonveg { background: #fff7ed; color: #c2540a; border: 1px solid #fed7aa; }
+
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  #view-auth { flex-direction: column; }
+  .auth-left { padding: 40px 28px; }
+  .auth-left h1 { font-size: 32px; }
+  .two-col, .results-grid { grid-template-columns: 1fr; }
+  .dist-grid { grid-template-columns: 1fr 1fr; }
+  .day-meals { grid-template-columns: 1fr 1fr; }
+  .meal-cell { border-bottom: 1px solid var(--border); }
+  .app-body { padding: 20px 16px; }
+  .results-actions { flex-direction: column; }
+  .results-actions .btn { max-width: 100%; }
+}
+</style>
+</head>
+<body style="visibility:hidden">
+
+<!-- ══════════ AUTH VIEW ══════════ -->
+<div id="view-auth" class="view active">
+  <div class="auth-left">
+    <div class="auth-brand">NutriCalc</div>
+    <h1>Smart Meal<br>Planning Made<br>Simple</h1>
+    <p>Calculate your maintenance calories based on your activity and get a personalised weekly Indian meal plan.</p>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div>Enter your body details</div>
+      <div class="step"><div class="step-num">2</div>Select activity level &amp; goal</div>
+      <div class="step"><div class="step-num">3</div>Get your weekly meal plan</div>
+    </div>
+  </div>
+
+  <div class="auth-right">
+    <div class="auth-box">
+      <h2>Welcome</h2>
+      <p class="auth-sub">Sign in or create your free account</p>
+
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('login')">Sign In</button>
+        <button class="tab" onclick="switchTab('register')">Register</button>
+      </div>
+
+      <!-- LOGIN -->
+      <div id="tab-login">
+        <div class="field"><label>Email</label>
+          <input type="email" id="l-email" placeholder="you@example.com"></div>
+        <div class="field"><label>Password</label>
+          <div class="pw-wrap">
+            <input type="password" id="l-pass" placeholder="Your password">
+            <button class="pw-toggle" onclick="togglePw('l-pass',this)" type="button">Show</button>
+          </div>
+        </div>
+        <button class="btn" id="btn-login" onclick="handleLogin()">Sign In →</button>
+        <div class="msg" id="login-msg"></div>
+      </div>
+
+      <!-- REGISTER -->
+      <div id="tab-register" style="display:none">
+        <div class="field"><label>Full Name</label>
+          <input type="text" id="r-name" placeholder="John Smith"></div>
+        <div class="field"><label>Email</label>
+          <input type="email" id="r-email" placeholder="you@gmail.com" oninput="validateEmailLive(this)">
+          <div class="field-hint" id="email-hint">Must be a valid Gmail address (e.g. name@gmail.com)</div>
+        </div>
+        <div class="field"><label>Password</label>
+          <div class="pw-wrap">
+            <input type="password" id="r-pass" placeholder="Min. 8 chars, include letters, numbers & symbols" oninput="checkPwStrength(this)">
+            <button class="pw-toggle" onclick="togglePw('r-pass',this)" type="button">Show</button>
+          </div>
+          <div class="field-hint">Must have uppercase, lowercase, a number and a special character (!@#$%^&amp;*)</div>
+          <div id="pw-strength-bar" style="margin-top:6px;height:4px;border-radius:4px;background:#e2e8f0;overflow:hidden;display:none">
+            <div id="pw-strength-fill" style="height:100%;width:0;border-radius:4px;transition:width .3s,background .3s"></div>
+          </div>
+          <div id="pw-strength-label" style="font-size:11px;margin-top:4px;display:none"></div>
+          <div style="margin-top:8px;">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:5px;font-weight:500;">💡 Suggested passwords — click to use:</div>
+            <div id="pw-suggestions" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+          </div>
+        </div>
+        <div class="field"><label>Confirm Password</label>
+          <div class="pw-wrap">
+            <input type="password" id="r-cpass" placeholder="Repeat password">
+            <button class="pw-toggle" onclick="togglePw('r-cpass',this)" type="button">Show</button>
+          </div>
+        </div>
+        <div class="field"><label>Food Preference</label>
+          <div class="radio-group">
+            <label class="radio-opt" id="food-veg-opt"><input type="radio" name="food_type" value="veg" onchange="selFoodType(this)"> 🥦 Vegetarian</label>
+            <label class="radio-opt" id="food-nonveg-opt"><input type="radio" name="food_type" value="nonveg" onchange="selFoodType(this)"> 🍗 Non-Veg</label>
+          </div>
+        </div>
+        <!-- Food Restrictions (shown based on selection) -->
+        <div class="field" id="veg-restrictions" style="display:none">
+          <label>Veg Restriction</label>
+          <div class="restriction-note restriction-note-veg">
+            🚫 <strong>Mushrooms</strong> are excluded from your vegetarian meal plan as per dietary guidelines.
+          </div>
+        </div>
+        <div class="field" id="nonveg-restrictions" style="display:none">
+          <label>Non-Veg Restriction</label>
+          <div class="restriction-note restriction-note-nonveg">
+            🚫 <strong>Seafood</strong> is excluded from your non-vegetarian meal plan as per dietary guidelines.
+          </div>
+        </div>
+        <!-- Terms Checkbox -->
+        <div class="field" id="disclaimer-box" style="display:none">
+          <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;padding:12px;border:1.5px solid var(--border);border-radius:9px;background:var(--teal-ll);">
+            <input type="checkbox" id="terms-checkbox" onchange="checkAgreeState()" style="margin-top:3px;width:16px;height:16px;accent-color:var(--teal);flex-shrink:0;">
+            <span style="font-size:13px;color:var(--ink2);line-height:1.5;">
+              I have read and agree to the <strong style="color:var(--teal)">Terms of Use &amp; Disclaimer</strong>. I understand that NutriCalc provides general information only and is not a substitute for professional medical advice.
+            </span>
+          </label>
+        </div>
+        <button class="btn" id="btn-reg" onclick="handleRegister()" disabled>Create Account →</button>
+        <div class="msg" id="reg-msg"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ APP VIEW ══════════ -->
+<div id="view-app" class="view">
+  <nav>
+    <div class="nav-brand">NutriCalc</div>
+    <div class="nav-right">
+      <span class="nav-name" id="nav-name"></span>
+      <button class="btn-sm" onclick="handleLogout()">Sign out</button>
+    </div>
+  </nav>
+
+  <div class="app-body">
+
+    <!-- PROFILE PAGE -->
+    <div id="page-profile">
+      <div class="page-header">
+        <div class="page-title">Your Profile</div>
+        <div class="page-sub">Fill in your details to calculate your personalised daily calorie target.</div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-title">Personal Details</div>
+          <div class="field"><label>Age</label>
+            <input type="number" id="p-age" placeholder="25" min="1" max="120"></div>
+          <div class="field"><label>Gender</label>
+            <div class="radio-group">
+              <label class="radio-opt"><input type="radio" name="gender" value="Male" onchange="selGender(this)"> Male</label>
+              <label class="radio-opt"><input type="radio" name="gender" value="Female" onchange="selGender(this)"> Female</label>
+              <label class="radio-opt"><input type="radio" name="gender" value="Other" onchange="selGender(this)"> Other</label>
+            </div>
+          </div>
+          <div class="field"><label>Height (cm)</label>
+            <input type="number" id="p-height" placeholder="170" min="50" max="250"></div>
+          <div class="field"><label>Weight (kg)</label>
+            <input type="number" id="p-weight" placeholder="70" min="20" max="300"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Activity &amp; Goals</div>
+          <div class="field"><label>Activity Level</label>
+            <select id="p-activity" onchange="showActivityNote(this)">
+              <option value="" disabled selected>Select activity level</option>
+              <option value="Sedentary">Sedentary (little / no exercise)</option>
+              <option value="Lightly Active">Lightly Active (1–3 days/week)</option>
+              <option value="Moderately Active">Moderately Active (3–5 days/week)</option>
+              <option value="Active">Active (6–7 days/week)</option>
+            </select>
+            <div id="activity-note" style="display:none;margin-top:8px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:10px 13px;font-size:12px;color:#0369a1;line-height:1.6;">
+              ℹ️ <strong>Note:</strong> These categories are based on standard BMR/TDEE formulas (Mifflin-St Jeor). They give a <em>general estimate</em> — not a precise measurement. Be honest about your activity; most people slightly overestimate. When in doubt, choose one level lower.
+            </div>
+          </div>
+          <div class="field"><label>Body Goal</label>
+            <select id="p-goal">
+              <option value="" disabled selected>Select your goal</option>
+              <option value="Fat Loss">Fat Loss (−400 kcal/day)</option>
+              <option value="Maintain Weight">Maintain Weight</option>
+              <option value="Muscle Gain">Muscle Gain (+400 kcal/day)</option>
+            </select>
+          </div>
+          <div style="margin-top:24px">
+            <button class="btn" id="btn-calc" onclick="handleCalculate()">Calculate My Calories →</button>
+            <div class="msg" id="calc-msg"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULTS PAGE -->
+    <div id="page-results">
+      <div class="page-header">
+        <div class="page-title">Your Calorie Breakdown</div>
+        <div class="page-sub">Personalised daily calorie target based on your details.</div>
+      </div>
+
+      <div class="results-grid">
+        <div class="result-card">
+          <div class="rc-label">Base Metabolic Rate</div>
+          <div class="rc-value" id="r-bmr">—</div>
+          <div class="rc-unit">kcal / day</div>
+        </div>
+        <div class="result-card">
+          <div class="rc-label">Maintenance (TDEE)</div>
+          <div class="rc-value" id="r-maint">—</div>
+          <div class="rc-unit">kcal / day</div>
+        </div>
+        <div class="result-card highlight">
+          <div class="rc-label">Daily Target</div>
+          <div class="rc-value" id="r-target">—</div>
+          <div class="rc-unit">kcal / day</div>
+        </div>
+      </div>
+
+      <div id="r-badge" class="adj-badge adj-zero">Goal: Maintain Weight · +0 kcal</div>
+
+      <div class="dist-grid">
+        <div class="dist-card dc-b">
+          <div class="dist-name">🌅 Breakfast</div>
+          <div class="dist-kcal" id="d-breakfast">—</div>
+          <div class="dist-pct">30% of target</div>
+        </div>
+        <div class="dist-card dc-l">
+          <div class="dist-name">☀️ Lunch</div>
+          <div class="dist-kcal" id="d-lunch">—</div>
+          <div class="dist-pct">40% of target</div>
+        </div>
+        <div class="dist-card dc-d">
+          <div class="dist-name">🌙 Dinner</div>
+          <div class="dist-kcal" id="d-dinner">—</div>
+          <div class="dist-pct">30% of target</div>
+        </div>
+      </div>
+
+      <div class="results-actions">
+        <button class="btn btn-accent" id="btn-gen-plan" onclick="handleGeneratePlan()">
+          View Weekly Meal Plan →
+        </button>
+        <button class="btn btn-outline" onclick="showPage('profile')">← Modify Details</button>
+      </div>
+      <div class="msg" id="gen-msg"></div>
+    </div>
+
+    <!-- MEAL PLAN PAGE -->
+    <div id="page-mealplan">
+      <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <div>
+          <div class="page-title">Weekly Meal Plan</div>
+          <div class="page-sub" id="plan-sub">7-day personalised Indian meal plan</div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-sm" style="width:auto;padding:8px 16px;font-size:13px" onclick="handleRegeneratePlan()">↻ Regenerate</button>
+          <button class="btn btn-outline btn-sm" style="width:auto;padding:8px 16px;font-size:13px" onclick="showPage('results')">← Back to Results</button>
+        </div>
+      </div>
+
+      <div id="plan-content">
+        <div class="plan-loading">Loading your meal plan…</div>
+      </div>
+    </div>
+
+  </div><!-- app-body -->
+</div><!-- view-app -->
+
+<!-- ══════════ SIGNATURE MODAL ══════════ -->
+
+<div id="toast"></div>
+
+<script>
+const API = '';
+let currentUser = null;
+
+// ── UTILS ──
+const $ = id => document.getElementById(id);
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  $(id).classList.add('active');
+}
+function showPage(name) {
+  ['profile','results','mealplan'].forEach(p => $('page-'+p).style.display = 'none');
+  $('page-'+name).style.display = 'block';
+}
+function toast(msg, ms=3000) {
+  const t=$('toast'); t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), ms);
+}
+function setMsg(id, msg, type='error') {
+  const el=$(id); el.textContent=msg; el.className='msg '+type;
+}
+function setLoading(bid, on, label='') {
+  const b=$(bid); b.disabled=on;
+  b.innerHTML = on ? `<span class="spinner"></span>Loading…` : label;
+}
+async function api(path, method='GET', body=null) {
+  const opts = { method, credentials:'include', headers:{'Content-Type':'application/json'} };
+  if (body) opts.body = JSON.stringify(body);
+  try {
+    const res  = await fetch(API+path, opts);
+    const data = await res.json();
+    return { ok:res.ok, status:res.status, data };
+  } catch(e) {
+    return { ok:false, data:{ message:'' } };
+  }
+}
+
+// ── AUTH ──
+function switchTab(tab) {
+  $('tab-login').style.display    = tab==='login'    ? '' : 'none';
+  $('tab-register').style.display = tab==='register' ? '' : 'none';
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',(i===0)===(tab==='login')));
+}
+function togglePw(id, btn) {
+  const el=$(id);
+  el.type = el.type==='password' ? 'text' : 'password';
+  btn.textContent = el.type==='password' ? 'Show' : 'Hide';
+}
+
+async function handleLogin() {
+  const email=$('l-email').value.trim(), password=$('l-pass').value;
+  if (!email||!password) return setMsg('login-msg','Please fill in all fields.');
+  setLoading('btn-login',true);
+  const {ok,data} = await api('/api/login','POST',{email,password});
+  setLoading('btn-login',false,'Sign In →');
+  if (!ok) return setMsg('login-msg',data.message||'Login failed.');
+  if (data.redirect) { setTimeout(()=>window.location.replace(data.redirect),300); return; }
+  currentUser=data; enterApp(data);
+}
+
+function validateEmailLive(input) {
+  const val = input.value.trim();
+  const hint = $('email-hint');
+  if (!val) { hint.className = 'field-hint'; hint.textContent = 'Must be a valid Gmail address (e.g. name@gmail.com)'; return; }
+  if (/^[a-zA-Z0-9._%+\-]+@gmail\.com$/.test(val)) {
+    hint.className = 'field-hint ok'; hint.textContent = '✓ Valid Gmail address';
+  } else {
+    hint.className = 'field-hint error'; hint.textContent = '✗ Only @gmail.com addresses are allowed';
+  }
+}
+
+function isValidGmail(email) {
+  return /^[a-zA-Z0-9._%+\-]+@gmail\.com$/.test(email.trim());
+}
+
+function isStrongPassword(pw) {
+  return pw.length >= 8 &&
+    /[A-Z]/.test(pw) &&   // uppercase
+    /[a-z]/.test(pw) &&   // lowercase
+    /[0-9]/.test(pw) &&   // digit
+    /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pw); // special char
+}
+
+function selFoodType(radio) {
+  document.querySelectorAll('.radio-opt').forEach(o => o.classList.remove('selected'));
+  radio.closest('.radio-opt').classList.add('selected');
+  const isVeg = radio.value === 'veg';
+  $('veg-restrictions').style.display    = isVeg   ? 'block' : 'none';
+  $('nonveg-restrictions').style.display = !isVeg  ? 'block' : 'none';
+  $('disclaimer-box').style.display = 'block';
+  checkAgreeState();
+}
+
+function checkAgreeState() {
+  const foodSelected = document.querySelector('input[name="food_type"]:checked');
+  const termsChecked = document.getElementById('terms-checkbox') && document.getElementById('terms-checkbox').checked;
+  $('btn-reg').disabled = !(termsChecked && foodSelected);
+}
+
+
+async function handleRegister() {
+  const full_name=$('r-name').value.trim(), email=$('r-email').value.trim(),
+        password=$('r-pass').value, confirm_password=$('r-cpass').value;
+  const foodEl = document.querySelector('input[name="food_type"]:checked');
+
+  if (!full_name||!email||!password||!confirm_password)
+    return setMsg('reg-msg','Please fill in all fields.');
+  if (!isValidGmail(email))
+    return setMsg('reg-msg','Please enter a valid Gmail address (e.g. name@gmail.com).');
+  if (!isStrongPassword(password))
+    return setMsg('reg-msg','Password must be 8+ characters with uppercase, lowercase, a number, and a special character.');
+  if (password !== confirm_password)
+    return setMsg('reg-msg','Passwords do not match.');
+  if (!foodEl)
+    return setMsg('reg-msg','Please select your food preference.');
+  if (!document.getElementById('terms-checkbox').checked)
+    return setMsg('reg-msg','Please agree to the Terms of Use to continue.');
+
+  const food_type = foodEl.value;
+  setLoading('btn-reg',true);
+  const {ok,data} = await api('/api/register','POST',{full_name,email,password,confirm_password,food_type});
+  setLoading('btn-reg',false,'Create Account →');
+  if (!ok) return setMsg('reg-msg',data.message||'Registration failed.');
+  setMsg('reg-msg','Account created! Signing you in…','success');
+  const {ok:ok2,data:d2} = await api('/api/login','POST',{email,password});
+  if (ok2) { currentUser=d2; enterApp(d2); }
+}
+
+async function handleLogout() {
+  await api('/api/logout','POST'); currentUser=null;
+  showView('view-auth'); toast('Signed out.');
+}
+
+function enterApp(user) {
+  if (user.is_admin) {
+    window.location.replace('/admin');
+    return;
+  }
+  $('nav-name').textContent = user.name;
+  showView('view-app');
+  if (user.has_profile) loadProfile();
+  showPage('profile');
+}
+
+// ── PROFILE ──
+async function loadProfile() {
+  const {ok,data} = await api('/api/profile');
+  if (!ok) return;
+  if (data.age)    $('p-age').value    = data.age;
+  if (data.height) $('p-height').value = data.height;
+  if (data.weight) $('p-weight').value = data.weight;
+  if (data.gender) {
+    const r=document.querySelector(`input[name="gender"][value="${data.gender}"]`);
+    if (r) { r.checked=true; selGender(r); }
+  }
+  if (data.activity_level) $('p-activity').value = data.activity_level;
+  if (data.body_goal)      $('p-goal').value     = data.body_goal;
+
+  if (data.target_calories) {
+    showResultsFromProfile(data);
+  }
+}
+
+function selGender(radio) {
+  document.querySelectorAll('.radio-opt').forEach(o=>o.classList.remove('selected'));
+  radio.closest('.radio-opt').classList.add('selected');
+}
+
+async function handleCalculate() {
+  const age=$('p-age').value, height=$('p-height').value, weight=$('p-weight').value,
+        activity=$('p-activity').value, goal=$('p-goal').value,
+        gEl=document.querySelector('input[name="gender"]:checked');
+  if (!age||!height||!weight||!activity||!goal||!gEl)
+    return setMsg('calc-msg','Please fill in all fields.');
+  setLoading('btn-calc',true); setMsg('calc-msg','');
+  const {ok,data} = await api('/api/calculate-calories','POST',{
+    age:parseInt(age), height:parseFloat(height), weight:parseFloat(weight),
+    gender:gEl.value, activity_level:activity, body_goal:goal
+  });
+  setLoading('btn-calc',false,'Calculate My Calories →');
+  if (!ok) return setMsg('calc-msg',data.message||'Calculation failed.');
+  renderResults(data); showPage('results');
+}
+
+function showResultsFromProfile(d) {
+  // called on re-login if user already has data
+  if (!d.target_calories) return;
+  const t=d.target_calories, m=d.maintenance_calories;
+  $('r-bmr').textContent   = '—';
+  $('r-maint').textContent = Math.round(m).toLocaleString();
+  $('r-target').textContent= Math.round(t).toLocaleString();
+  $('d-breakfast').textContent = Math.round(t*0.30)+' kcal';
+  $('d-lunch').textContent     = Math.round(t*0.40)+' kcal';
+  $('d-dinner').textContent    = Math.round(t*0.30)+' kcal';
+  const adj = d.body_goal==='Fat Loss'?-400:d.body_goal==='Muscle Gain'?400:0;
+  setBadge(adj, d.body_goal);
+}
+
+function renderResults(d) {
+  $('r-bmr').textContent    = Math.round(d.bmr).toLocaleString();
+  $('r-maint').textContent  = Math.round(d.maintenance_calories).toLocaleString();
+  $('r-target').textContent = Math.round(d.target_calories).toLocaleString();
+  const m=d.meal_distribution;
+  $('d-breakfast').textContent = Math.round(m.breakfast)+' kcal';
+  $('d-lunch').textContent     = Math.round(m.lunch)+' kcal';
+  $('d-dinner').textContent    = Math.round(m.dinner)+' kcal';
+  setBadge(d.adjustment, d.goal);
+}
+
+function setBadge(adj, goal) {
+  const b=$('r-badge'), sign=adj>0?'+':'';
+  b.textContent=`Goal: ${goal} · ${sign}${adj} kcal`;
+  b.className='adj-badge '+(adj>0?'adj-pos':adj<0?'adj-neg':'adj-zero');
+}
+
+// ── MEAL PLAN ──
+async function handleGeneratePlan() {
+  setLoading('btn-gen-plan',true);
+  const {ok,data} = await api('/api/meal-plan/generate','POST');
+  setLoading('btn-gen-plan',false,'View Weekly Meal Plan →');
+  if (!ok) return setMsg('gen-msg',data.message||'Failed to generate plan.');
+  setMsg('gen-msg','');
+  showPage('mealplan');
+  loadMealPlan();
+}
+
+async function handleRegeneratePlan() {
+  const btn=document.querySelector('#page-mealplan .btn-sm');
+  if(btn){btn.disabled=true;btn.textContent='Generating…';}
+  const {ok,data} = await api('/api/meal-plan/generate','POST');
+  if(btn){btn.disabled=false;btn.textContent='↻ Regenerate';}
+  if (!ok) return toast(data.message||'Failed.');
+  toast('New meal plan generated!');
+  loadMealPlan();
+}
+
+async function loadMealPlan() {
+  $('plan-content').innerHTML = '<div class="plan-loading">Loading your meal plan…</div>';
+  const {ok,data} = await api('/api/meal-plan');
+  if (!ok || !data.length) {
+    $('plan-content').innerHTML = `
+      <div class="plan-empty">
+        <p>No meal plan yet.</p>
+        <button class="btn" style="max-width:200px" onclick="handleGeneratePlan()">Generate Plan</button>
+      </div>`;
+    return;
+  }
+  renderPlan(data);
+}
+
+function macroRow(food) {
+  if (!food) return '<div style="color:var(--muted);font-size:12px;padding:4px 0">Not available</div>';
+  return `
+    <div class="meal-food-name">${food.name || '—'}</div>
+    <div class="meal-macros">
+      <span class="macro-pill mp-kcal">${Math.round(food.calories || 0)} kcal</span>
+      <span class="macro-pill mp-p">${(food.protein||0).toFixed(1)}g P</span>
+      <span class="macro-pill mp-c">${(food.carbs||0).toFixed(1)}g C</span>
+      <span class="macro-pill mp-f">${(food.fat||0).toFixed(1)}g F</span>
+    </div>`;
+}
+
+function renderPlan(days) {
+  if (!days || days.length === 0) {
+    $('plan-content').innerHTML = '<div class="plan-empty"><p>No meal plan data found.</p></div>';
+    return;
+  }
+
+  const avg = Math.round(days.reduce((s,d) => s + (d.total_calories||0), 0) / days.length);
+  $('plan-sub').textContent = `7-day plan · avg ${avg} kcal/day`;
+
+  const html = days.map((d, i) => `
+    <div class="day-row">
+      <div class="day-header" onclick="toggleDay(${i})">
+        <div class="day-name">${d.day || 'Day '+(i+1)}</div>
+        <div style="display:flex;align-items:center;gap:16px">
+          <div class="day-total">${Math.round(d.total_calories||0)} kcal</div>
+          <div class="day-arrow" id="arr-${i}">▼</div>
+        </div>
+      </div>
+      <div class="day-meals" id="meals-${i}">
+        <div class="meal-cell mc-b">
+          <div class="meal-type-label">🌅 Breakfast</div>
+          ${macroRow(d.breakfast)}
+        </div>
+        <div class="meal-cell mc-l">
+          <div class="meal-type-label">☀️ Lunch</div>
+          ${macroRow(d.lunch)}
+        </div>
+        <div class="meal-cell mc-d">
+          <div class="meal-type-label">🌙 Dinner</div>
+          ${macroRow(d.dinner)}
+        </div>
+      </div>
+    </div>`).join('');
+
+  $('plan-content').innerHTML = `<div class="week-grid">${html}</div>`;
+}
+
+function toggleDay(i) {
+  const meals=$(`meals-${i}`), arr=$(`arr-${i}`);
+  const hidden = meals.style.display==='none';
+  meals.style.display = hidden ? '' : 'none';
+  arr.classList.toggle('open', hidden);
+}
+
+// ── ACTIVITY NOTE ──
+function showActivityNote(sel) {
+  const note = $('activity-note');
+  if (sel.value) note.style.display = 'block';
+}
+
+// ── PASSWORD STRENGTH ──
+function checkPwStrength(input) {
+  const pw = input.value;
+  const bar = $('pw-strength-bar');
+  const fill = $('pw-strength-fill');
+  const label = $('pw-strength-label');
+  if (!pw) { bar.style.display = 'none'; label.style.display = 'none'; return; }
+  bar.style.display = 'block'; label.style.display = 'block';
+  let score = 0;
+  if (pw.length >= 8)  score++;
+  if (pw.length >= 12) score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (/[a-z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pw)) score++;
+  const levels = [
+    { pct:'16%',  color:'#ef4444', text:'Very Weak' },
+    { pct:'32%',  color:'#f97316', text:'Weak' },
+    { pct:'50%',  color:'#eab308', text:'Fair' },
+    { pct:'66%',  color:'#84cc16', text:'Good' },
+    { pct:'83%',  color:'#22c55e', text:'Strong' },
+    { pct:'100%', color:'#10b981', text:'Very Strong ✓' },
+  ];
+  const lvl = levels[Math.min(score, 5)];
+  fill.style.width = lvl.pct;
+  fill.style.background = lvl.color;
+  label.textContent = lvl.text;
+  label.style.color = lvl.color;
+}
+
+// ── PASSWORD SUGGESTIONS ──
+function generateSuggestions() {
+  const words   = ['Mango','Tiger','Cloud','Storm','Pixel','Ocean','Blaze','Swift','Falcon','Maple'];
+  const special = ['!','@','#','$','%','&','*'];
+  const sug = [];
+  for (let i = 0; i < 4; i++) {
+    const w1  = words[Math.floor(Math.random()*words.length)];
+    const w2  = words[Math.floor(Math.random()*words.length)];
+    const num = Math.floor(Math.random()*90)+10;
+    const sp  = special[Math.floor(Math.random()*special.length)];
+    sug.push(`${w1}${w2}${num}${sp}`);
+  }
+  return sug;
+}
+
+function renderPasswordSuggestions() {
+  const container = $('pw-suggestions');
+  const sugs = generateSuggestions();
+  container.innerHTML = sugs.map(s => `
+    <button type="button" onclick="useSuggestion('${s}')"
+      style="font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid var(--border);
+             background:var(--bg);color:var(--ink2);cursor:pointer;font-family:'DM Sans',sans-serif;
+             transition:all .15s;" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)'"
+             onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--ink2)'">${s}</button>
+  `).join('');
+}
+
+function useSuggestion(pw) {
+  const inp = $('r-pass');
+  inp.value = pw;
+  inp.type  = 'text';
+  const btn = inp.nextElementSibling;
+  if (btn) btn.textContent = 'Hide';
+  checkPwStrength(inp);
+  toast('Password applied! Make sure to remember it.');
+}
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', () => {
+  ['profile','results','mealplan'].forEach(p => $('page-'+p).style.display = 'none');
+  $('page-profile').style.display = 'block';
+  renderPasswordSuggestions();
+});
+
+(async () => {
+  const {ok,data} = await api('/api/profile');
+  if (ok) {
+    if (data.is_admin) { window.location.replace('/admin'); return; }
+    currentUser=data; $('nav-name').textContent=data.name;
+    showView('view-app');
+    await loadProfile();
+    if (data.target_calories) { showPage('results'); }
+    else { showPage('profile'); }
+  }
+  document.body.style.visibility = 'visible';
+})();
+</script>
+</body>
+</html>

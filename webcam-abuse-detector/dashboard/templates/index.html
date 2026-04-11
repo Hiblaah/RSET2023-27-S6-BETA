@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Webcam Access Abuse Detector</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+<h1>Webcam Usage Dashboard</h1>
+
+<div class="stats">
+
+<div class="card">
+<h2>Total Access Events</h2>
+<p>{{total}}</p>
+</div>
+
+<div class="card green">
+<h2>Normal Activity</h2>
+<p>{{normal}}</p>
+</div>
+
+<div class="card red">
+<h2>Suspicious Activity</h2>
+<p>{{suspicious}}</p>
+</div>
+
+</div>
+
+<h2>Access Events</h2>
+
+<table>
+<tr>
+<th>Application</th>
+<th>Date</th>
+<th>Time</th>
+<th>Duration</th>
+<th>Status</th>
+</tr>
+
+{% for e in events %}
+
+<tr>
+<td>{{e.application}}</td>
+<td>{{e.date}}</td>
+<td>{{e.time}}</td>
+<td>{{e.duration}}</td>
+
+<td class="{{e.status}}">
+{{e.status}}
+</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</body>
+</html>

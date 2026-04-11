@@ -1,0 +1,13 @@
+<paths>
+    <files-path
+        name="internal_files"
+        path="." />
+
+    <external-files-path
+        name="external_files"
+        path="." />
+
+    <external-path
+        name="external"
+        path="." />
+</paths>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<title>Webcam Abuse Detection Dashboard</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="app">
+
+```
+<!-- Sidebar -->
+<div class="sidebar">
+   <a href="index.html" class="active">Event History</a>
+   <a href="alerts.html">Alerts</a>
+</div>
+
+
+<!-- Main Section -->
+<div class="main">
+
+    <!-- Header -->
+    <div class="header">
+
+        <div class="title">
+            <h1>Event History</h1>
+            <p>Real-time webcam monitoring dashboard</p>
+        </div>
+
+        <div class="controls">
+
+            <div class="status online" id="statusBox">
+                ONLINE
+            </div>
+
+            <button onclick="toggleMonitoring()" id="monitorBtn">
+                Stop Monitoring
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- Dashboard Grid -->
+    <div class="dashboard">
+
+        <!-- Live Camera -->
+    <!-- Monitoring Status -->
+
+
+
+    </div>
+
+
+    <!-- Webcam Activity Logs -->
+<div class="card history">
+
+<h2>Webcam Activity Logs</h2>
+
+<table>
+
+<thead>
+<tr>
+<th>Application</th>
+<th>Date</th>
+<th>Time</th>
+<th>Duration</th>
+<th>Status</th>
+</tr>
+</thead>
+
+<tbody id="logTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+```
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>

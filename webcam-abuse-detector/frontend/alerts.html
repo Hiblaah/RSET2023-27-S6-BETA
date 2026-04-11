@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<title>Webcam Abuse Detection Dashboard</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="app">
+
+<!-- Sidebar -->
+<div class="sidebar">
+   <a href="index.html">Event History</a>
+   <a href="alerts.html" class="active">Alerts</a>
+</div>
+
+
+<!-- Main Section -->
+<div class="main">
+
+<div class="header">
+
+<div class="title">
+<h1>Security Alerts</h1>
+<p>Suspicious webcam activity detected</p>
+</div>
+
+</div>
+
+
+<!-- Alerts Table -->
+
+<div class="card history">
+
+<h2>Suspicious Webcam Alerts</h2>
+
+<table>
+
+<thead>
+<tr>
+<th>Application</th>
+<th>Date</th>
+<th>Time</th>
+<th>Duration</th>
+<th>Status</th>
+</tr>
+</thead>
+
+<tbody id="alertTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+<script src="alerts.js"></script>
+
+</body>
+</html>

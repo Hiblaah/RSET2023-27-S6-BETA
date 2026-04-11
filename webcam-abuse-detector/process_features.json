@@ -1,0 +1,11 @@
+[
+  {
+    "is_known_app": 1,
+    "is_foreground": 0,
+    "user_active": 1,
+    "is_night": 0,
+    "has_network_connection": 1,
+    "network_connection_count": 2,
+    "duration_minutes": 0.184
+  }
+]

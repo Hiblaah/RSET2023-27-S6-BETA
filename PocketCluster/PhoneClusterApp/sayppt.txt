@@ -1,0 +1,54 @@
+USE CASE DIAGRAM
+“This use case diagram shows how different components interact in the system.
+The user can upload, download, search, view, and delete files.
+
+The <<include>> relationships represent mandatory internal steps that always happen as part of a user action.
+For example, uploading a file always includes chunking, metadata storage, and distribution.
+
+The controller handles these included operations like chunking, search handling, metadata management, and file reconstruction.
+Storage nodes are old mobile devices that only store and return encrypted file chunks.”
+=============================================================================
+SEQUENCE DIAGRAM UPLOAD
+“This slide shows the secure upload flow in detail.
+When a user uploads a file, the controller first generates a semantic summary of the file.
+
+The purpose of this summary is not compression or preview, but searchability.
+Instead of embedding the entire file, we extract the high-level meaning of the content and store embeddings derived from that summary.”
+Embedding the full file would be computationally expensive, unnecessary for searching.
+A summary captures intent and meaning with much lower cost and risk.
+
+“This allows the system to support intelligent, natural-language search later, without ever needing to access the entire file.
+
+After this, the file itself is encrypted, then chunked, and the encrypted chunks are distributed across multiple mobile storage nodes with replication.
+Metadata such as chunk-to-node mapping is stored separately by the controller.”
+=============================================================================
+SEQUENCE DIAGRAM DOWNLOAD
+This slide explains how secure file download works.
+
+When the user wants to download a file, the process does not start by accessing stored data.
+Instead, the user’s query is first converted into an embedding and matched against embeddings that were generated earlier from file summaries.
+These embeddings represent the semantic meaning of files, so the system can identify relevant files without looking at filenames or file contents.
+This is important because the actual file data is encrypted and distributed, so searching directly over file contents would break the zero-trust model.
+Once the user selects a file from the search results, the controller retrieves the metadata that maps file chunks to storage nodes.
+It then requests the encrypted chunks from the relevant mobile devices.”
+
+Explain why reconstruction is needed:
+
+“Since the file was originally split into chunks and stored across multiple nodes, the controller must collect all required chunks, decrypt them, and reconstruct the original file before delivering it to the user.”
+
+Finish strong:
+
+“Throughout this process, storage nodes only return encrypted data and never participate in search, decryption, or reconstruction
+=============================================================================
+UI HOME PAGE AND UPLOAD PAGE
+These screens show the user interface that sits on top of the system.
+The home page gives the user visibility into the cluster — such as connected storage nodes, overall storage usage, and system status.
+
+The upload page allows users to upload files securely, while hiding all the underlying complexity like encryption, chunking, and distribution.
+=============================================================================
+UI RAG AND FILE LISTING
+This slide shows how smart file search works in the system.
+Instead of searching by filenames, users can use natural language queries.
+The system converts the query into an embedding and matches it against embeddings generated from file summaries.
+The file listing works like a regular cloud storage directory, similar to Google Drive.
+It shows all the files the user has uploaded or saved, based on metadata maintained by the controller

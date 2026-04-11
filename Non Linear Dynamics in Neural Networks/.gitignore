@@ -1,0 +1,8 @@
+fmri_env/
+.vscode/
+_pycache_/
+*.pyc
+results/
+outputs/
+*.npy
+.DS_Store

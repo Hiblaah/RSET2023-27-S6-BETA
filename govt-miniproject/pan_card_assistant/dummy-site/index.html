@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>PAN Application Form - Dummy Site</title>
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&display=swap');
+
+*{ box-sizing: border-box; margin:0; padding:0; }
+
+body{
+  font-family: 'Noto Sans', sans-serif;
+  background: #f9dac5;
+  font-size: 14px;
+}
+
+/* ===== POPUP ===== */
+#referencePopup{
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  background: white;
+  padding: 30px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+  border-radius: 10px;
+  z-index: 999;
+  text-align: center;
+}
+#referencePopup h3{ color: #002e6e; margin-bottom:10px; }
+#referencePopup p{ font-size:18px; font-weight:700; color:#f37321; margin-bottom:15px; }
+
+/* ===== HEADER ===== */
+.header{
+  background: #002e6e;
+  color: white;
+  padding: 12px 30px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.header h1{ font-size: 18px; font-weight:700; }
+.header span{ font-size: 12px; opacity: 0.8; }
+
+/* ===== PROGRESS STEPS ===== */
+.top-section{
+  background: white;
+  border-bottom: 3px solid #f37321;
+  padding: 18px 0 10px;
+}
+
+.steps{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+}
+
+.step-item{
+  display: flex;
+  align-items: center;
+}
+
+.step-circle{
+  text-align: center;
+  margin: 0 10px;
+}
+
+.circle{
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: #ccc;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 700;
+  font-size: 15px;
+  margin: 0 auto 4px;
+  transition: background 0.3s;
+}
+
+.circle.active{ background: #f37321; }
+.circle.done{ background: #002e6e; }
+
+.step-circle p{ font-size: 11px; color: #555; }
+
+.connector{
+  width: 40px; height: 2px;
+  background: #ccc;
+  margin-bottom: 16px;
+}
+
+.info-box{
+  width: 90%;
+  margin: 12px auto 0;
+  background: #efd4b6;
+  border: 1px solid #caa57a;
+  padding: 10px 15px;
+  font-size: 13px;
+  border-radius: 4px;
+}
+.info-box span{ color: #b54800; font-weight: 700; }
+
+/* ===== CONTAINER ===== */
+.container{
+  width: 92%;
+  max-width: 1000px;
+  margin: 20px auto;
+  background: #fff;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.section-title{
+  font-size: 16px;
+  font-weight: 700;
+  color: #002e6e;
+  margin: 20px 0 10px;
+  border-left: 4px solid #f37321;
+  padding-left: 10px;
+}
+
+h3{
+  background: #e3ebef;
+  color: #964404;
+  padding: 8px 12px;
+  font-size: 13px;
+  margin: 18px 0 10px;
+  border-radius: 3px;
+}
+
+label{
+  font-size: 13px;
+  color: #333;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 4px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="date"],
+select{
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 13px;
+  margin-bottom: 14px;
+  font-family: inherit;
+  background: white;
+  transition: border 0.2s;
+}
+
+input:focus, select:focus{
+  outline: none;
+  border-color: #f37321;
+  box-shadow: 0 0 0 2px rgba(243,115,33,0.15);
+}
+
+input:disabled{
+  background: #f5f5f5;
+  color: #999;
+}
+
+.form-group{ margin-bottom: 5px; }
+
+.row{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.row-3{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 15px;
+}
+
+.row-4{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 15px;
+}
+
+/* ===== STEP VISIBILITY ===== */
+.step{ display: none; }
+.step.active{ display: block; }
+
+/* ===== NAV BUTTONS ===== */
+.nav{
+  display: flex;
+  justify-content: space-between;
+  margin-top: 25px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+}
+
+button{
+  padding: 10px 28px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+
+.btn-primary{
+  background: #002e6e;
+  color: white;
+}
+.btn-primary:hover{ background: #004399; }
+
+.btn-secondary{
+  background: #e0e0e0;
+  color: #333;
+}
+.btn-secondary:hover{ background: #ccc; }
+
+/* ===== UPLOAD SECTION ===== */
+.upload-section{
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  background: #fafafa;
+}
+
+.file-hint{
+  font-size: 11px;
+  color: #888;
+  margin-top: -10px;
+  margin-bottom: 10px;
+}
+
+/* ===== PAYMENT ===== */
+.payment-box{
+  border: 1px solid #ccc;
+  padding: 25px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  max-width: 500px;
+}
+
+.payment-box table{ width:100%; margin-bottom:15px; }
+.payment-box td{ padding: 6px 0; }
+.payment-box td:first-child{ font-weight:600; color:#555; }
+.payment-box td:last-child{ color:#002e6e; font-weight:700; }
+
+/* FIX: payment-success starts hidden, shown with block after payment */
+.payment-success{
+  display: none;
+  background: #e8f5e9;
+  border: 1px solid #4caf50;
+  padding: 20px;
+  border-radius: 8px;
+  color: #2e7d32;
+  font-weight: 700;
+  font-size: 16px;
+  text-align: center;
+  margin-top: 15px;
+}
+
+/* ===== CHECKBOX GROUP ===== */
+.checkbox-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.checkbox-grid label{
+  font-weight: 400;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  cursor:pointer;
+}
+
+/* required star */
+.req{ color: red; }
+
+/* file upload status label */
+.file-status{
+  font-size: 12px;
+  color: #2e7d32;
+  font-weight: 600;
+  margin-top: -8px;
+  margin-bottom: 6px;
+  min-height: 16px;
+}
+
+/* verified badge */
+#aadhaarVerified{
+  display:none;
+  color:green;
+  font-weight:700;
+  font-size:12px;
+  margin-top:-10px;
+  margin-bottom:10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- POPUP -->
+<div id="referencePopup">
+  <h3>Your Reference ID</h3>
+  <p id="refId"></p>
+  <button class="btn-primary" onclick="closePopup()">OK</button>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div>
+    <h1>Online PAN Application — Form 49A</h1>
+    <span>Government Document Assistance Portal (Dummy)</span>
+  </div>
+</div>
+
+<!-- PROGRESS BAR -->
+<div class="top-section">
+  <div class="steps">
+
+    <div class="step-item">
+      <div class="step-circle">
+        <div class="circle active" id="c1">1</div>
+        <p>Personal</p>
+      </div>
+    </div>
+    <div class="connector"></div>
+
+    <div class="step-item">
+      <div class="step-circle">
+        <div class="circle" id="c2">2</div>
+        <p>Document</p>
+      </div>
+    </div>
+    <div class="connector"></div>
+
+    <div class="step-item">
+      <div class="step-circle">
+        <div class="circle" id="c3">3</div>
+        <p>Contact</p>
+      </div>
+    </div>
+    <div class="connector"></div>
+
+    <div class="step-item">
+      <div class="step-circle">
+        <div class="circle" id="c4">4</div>
+        <p>Address</p>
+      </div>
+    </div>
+    <div class="connector"></div>
+
+    <div class="step-item">
+      <div class="step-circle">
+        <div class="circle" id="c5">5</div>
+        <p>Other</p>
+      </div>
+    </div>
+    <div class="connector"></div>
+
+    <div class="step-item">
+      <div class="step-circle">
+        <div class="circle" id="c6">6</div>
+        <p>Upload</p>
+      </div>
+    </div>
+    <div class="connector"></div>
+
+    <div class="step-item">
+      <div class="step-circle">
+        <div class="circle" id="c7">7</div>
+        <p>Payment</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="info-box">
+    Application Mode: <span>Digital Application (eSign Mode)</span> &nbsp;|&nbsp;
+    PAN Card Mode: <span>Physical + e-PAN</span> &nbsp;|&nbsp;
+    Status: <span>Individual</span> &nbsp;|&nbsp;
+    Reference No: <span id="refDisplay"></span>
+  </div>
+</div>
+
+<!-- FORM CONTAINER -->
+<div class="container">
+
+<!-- ===================== STEP 1: PERSONAL ===================== -->
+<div class="step active" id="step1">
+  <p class="section-title">Personal Details</p>
+
+  <h3>Name</h3>
+  <div class="row-3">
+    <div class="form-group">
+      <label>First Name <span class="req">*</span></label>
+      <input type="text" id="firstName" placeholder="First Name">
+    </div>
+    <div class="form-group">
+      <label>Middle Name</label>
+      <input type="text" id="middleName" placeholder="Middle Name">
+    </div>
+    <div class="form-group">
+      <label>Last Name / Surname <span class="req">*</span></label>
+      <input type="text" id="lastName" placeholder="Last Name">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>Name to be printed on PAN Card <span class="req">*</span></label>
+    <input type="text" id="nameOnCard" placeholder="Name as it should appear on card">
+  </div>
+
+  <h3>Other Details</h3>
+  <div class="row">
+    <div class="form-group">
+      <label>Have you been known by any other name?</label>
+      <select id="otherName">
+        <option value="No">No</option>
+        <option value="Yes">Yes</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Gender <span class="req">*</span></label>
+      <select id="gender">
+        <option value="">Select Gender</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="form-group">
+      <label>Date of Birth <span class="req">*</span></label>
+      <input type="date" id="dob">
+    </div>
+    <div class="form-group">
+      <label>Address for Communication <span class="req">*</span></label>
+      <select id="addressType">
+        <option value="Residence">Residence</option>
+        <option value="Office">Office</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="form-group">
+      <label>Residence State <span class="req">*</span></label>
+      <select id="residentState">
+        <option value="">Select Residence State</option>
+        <option>Andhra Pradesh</option><option>Arunachal Pradesh</option>
+        <option>Assam</option><option>Bihar</option><option>Chhattisgarh</option>
+        <option>Goa</option><option>Gujarat</option><option>Haryana</option>
+        <option>Himachal Pradesh</option><option>Jharkhand</option>
+        <option>Karnataka</option><option>Kerala</option>
+        <option>Madhya Pradesh</option><option>Maharashtra</option>
+        <option>Manipur</option><option>Meghalaya</option><option>Mizoram</option>
+        <option>Nagaland</option><option>Odisha</option><option>Punjab</option>
+        <option>Rajasthan</option><option>Sikkim</option><option>Tamil Nadu</option>
+        <option>Telangana</option><option>Tripura</option>
+        <option>Uttar Pradesh</option><option>Uttarakhand</option>
+        <option>West Bengal</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Office State (Optional)</label>
+      <select id="officeState">
+        <option value="">Select Office State</option>
+        <option>Andhra Pradesh</option><option>Arunachal Pradesh</option>
+        <option>Assam</option><option>Bihar</option><option>Chhattisgarh</option>
+        <option>Goa</option><option>Gujarat</option><option>Haryana</option>
+        <option>Himachal Pradesh</option><option>Jharkhand</option>
+        <option>Karnataka</option><option>Kerala</option>
+        <option>Madhya Pradesh</option><option>Maharashtra</option>
+        <option>Manipur</option><option>Meghalaya</option><option>Mizoram</option>
+        <option>Nagaland</option><option>Odisha</option><option>Punjab</option>
+        <option>Rajasthan</option><option>Sikkim</option><option>Tamil Nadu</option>
+        <option>Telangana</option><option>Tripura</option>
+        <option>Uttar Pradesh</option><option>Uttarakhand</option>
+        <option>West Bengal</option>
+      </select>
+    </div>
+  </div>
+
+  <h3>Aadhaar Details</h3>
+  <div class="row">
+    <div class="form-group">
+      <label>Aadhaar Number <span class="req">*</span></label>
+      <input type="text" id="aadhaar" placeholder="XXXX XXXX XXXX" onblur="verifyAadhaar()">
+      <div id="aadhaarVerified">✔ Aadhaar Verified</div>
+    </div>
+    <div class="form-group">
+      <label>Name as per Aadhaar</label>
+      <input type="text" id="aadhaarName" placeholder="Auto-filled after verification" disabled>
+    </div>
+  </div>
+
+  <div class="nav">
+    <span></span>
+    <button class="btn-primary" onclick="nextStep(2)">Next →</button>
+  </div>
+</div>
+
+<!-- ===================== STEP 2: DOCUMENT ===================== -->
+<div class="step" id="step2">
+  <p class="section-title">Document Details</p>
+  <h3>Documents submitted as Proof of Identity, Address and Date of Birth</h3>
+
+  <div class="form-group">
+    <label>Identity Proof (POI) <span class="req">*</span></label>
+    <select id="poiDoc">
+      <option value="Aadhaar">AADHAAR Card issued by UIDAI (In Copy)</option>
+      <option value="Passport">Passport</option>
+      <option value="VoterID">Voter ID</option>
+      <option value="DrivingLicense">Driving License</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label>Address Proof (POA) <span class="req">*</span></label>
+    <select id="poaDoc">
+      <option value="Aadhaar">AADHAAR Card issued by UIDAI (In Copy)</option>
+      <option value="Passport">Passport</option>
+      <option value="DrivingLicense">Driving License</option>
+      <option value="BankStatement">Bank Statement</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label>Date of Birth Proof (DOB) <span class="req">*</span></label>
+    <select id="dobDoc">
+      <option value="Aadhaar">AADHAAR Card issued by UIDAI (In Copy)</option>
+      <option value="BirthCert">Birth Certificate</option>
+      <option value="Passport">Passport</option>
+      <option value="SSLC">SSLC Certificate</option>
+    </select>
+  </div>
+
+  <div class="nav">
+    <button class="btn-secondary" onclick="nextStep(1)">← Back</button>
+    <button class="btn-primary" onclick="nextStep(3)">Next →</button>
+  </div>
+</div>
+
+<!-- ===================== STEP 3: CONTACT ===================== -->
+<div class="step" id="step3">
+  <p class="section-title">Contact Details</p>
+
+  <h3>Telephone & Email</h3>
+  <div class="row">
+    <div class="form-group">
+      <label>ISD Code</label>
+      <select id="isdCode">
+        <option value="+91">India (+91)</option>
+        <option value="+1">USA (+1)</option>
+        <option value="+44">UK (+44)</option>
+        <option value="+61">Australia (+61)</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>STD / Area Code (Optional)</label>
+      <input type="text" id="stdCode" placeholder="e.g. 0484">
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="form-group">
+      <label>Mobile Number <span class="req">*</span></label>
+      <input type="text" id="mobile" placeholder="10-digit mobile number">
+    </div>
+    <div class="form-group">
+      <label>Email ID <span class="req">*</span></label>
+      <input type="email" id="email" placeholder="example@email.com">
+    </div>
+  </div>
+
+  <h3>Father's Name <small style="font-weight:400;font-size:12px;">(Mandatory except single mother)</small></h3>
+  <div class="row-3">
+    <div class="form-group">
+      <label>First Name <span class="req">*</span></label>
+      <input type="text" id="fatherFirstName" placeholder="Father's First Name">
+    </div>
+    <div class="form-group">
+      <label>Middle Name</label>
+      <input type="text" id="fatherMiddleName" placeholder="Father's Middle Name">
+    </div>
+    <div class="form-group">
+      <label>Last Name <span class="req">*</span></label>
+      <input type="text" id="fatherLastName" placeholder="Father's Last Name">
+    </div>
+  </div>
+
+  <h3>Mother's Name <small style="font-weight:400;font-size:12px;">(Optional)</small></h3>
+  <div class="row-3">
+    <div class="form-group">
+      <label>First Name</label>
+      <input type="text" id="motherFirstName" placeholder="Mother's First Name">
+    </div>
+    <div class="form-group">
+      <label>Middle Name</label>
+      <input type="text" id="motherMiddleName" placeholder="Mother's Middle Name">
+    </div>
+    <div class="form-group">
+      <label>Last Name</label>
+      <input type="text" id="motherLastName" placeholder="Mother's Last Name">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>Name to be printed on PAN Card <span class="req">*</span></label>
+    <select id="parentNameOnCard">
+      <option value="Father">Father's Name</option>
+      <option value="Mother">Mother's Name</option>
+    </select>
+  </div>
+
+  <div class="nav">
+    <button class="btn-secondary" onclick="nextStep(2)">← Back</button>
+    <button class="btn-primary" onclick="nextStep(4)">Next →</button>
+  </div>
+</div>
+
+<!-- ===================== STEP 4: ADDRESS ===================== -->
+<div class="step" id="step4">
+  <p class="section-title">Address Details</p>
+
+  <h3>Residential Address</h3>
+  <div class="row">
+    <div class="form-group">
+      <label>Flat / Door / Block No</label>
+      <input type="text" id="resFlatNo" placeholder="e.g. 12B">
+    </div>
+    <div class="form-group">
+      <label>Name of Premises / Building / Village</label>
+      <input type="text" id="resBuilding" placeholder="Building or Village name">
+    </div>
+  </div>
+  <div class="row">
+    <div class="form-group">
+      <label>Road / Street / Lane</label>
+      <input type="text" id="resRoad" placeholder="Road or Street name">
+    </div>
+    <div class="form-group">
+      <label>Area / Locality / Sub-Division</label>
+      <input type="text" id="resLocality" placeholder="Area or Locality">
+    </div>
+  </div>
+  <div class="row">
+    <div class="form-group">
+      <label>Town / City <span class="req">*</span></label>
+      <input type="text" id="resCity" placeholder="Town or City">
+    </div>
+    <div class="form-group">
+      <label>District <span class="req">*</span></label>
+      <select id="resDistrict">
+        <option value="">Select District</option>
+        <option>Alappuzha</option><option>Ernakulam</option><option>Idukki</option>
+        <option>Kannur</option><option>Kasaragod</option><option>Kollam</option>
+        <option>Kottayam</option><option>Kozhikode</option><option>Malappuram</option>
+        <option>Palakkad</option><option>Pathanamthitta</option>
+        <option>Thiruvananthapuram</option><option>Thrissur</option><option>Wayanad</option>
+      </select>
+    </div>
+  </div>
+  <div class="row">
+    <div class="form-group">
+      <label>State <span class="req">*</span></label>
+      <select id="resState">
+        <option value="">Select State</option>
+        <option>Andhra Pradesh</option><option>Arunachal Pradesh</option>
+        <option>Assam</option><option>Bihar</option><option>Chhattisgarh</option>
+        <option>Goa</option><option>Gujarat</option><option>Haryana</option>
+        <option>Himachal Pradesh</option><option>Jharkhand</option>
+        <option>Karnataka</option><option>Kerala</option>
+        <option>Madhya Pradesh</option><option>Maharashtra</option>
+        <option>Manipur</option><option>Meghalaya</option><option>Mizoram</option>
+        <option>Nagaland</option><option>Odisha</option><option>Punjab</option>
+        <option>Rajasthan</option><option>Sikkim</option><option>Tamil Nadu</option>
+        <option>Telangana</option><option>Tripura</option>
+        <option>Uttar Pradesh</option><option>Uttarakhand</option>
+        <option>West Bengal</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Country</label>
+      <select id="resCountry">
+        <option value="India">India</option>
+        <option value="USA">USA</option>
+        <option value="UK">UK</option>
+      </select>
+    </div>
+  </div>
+  <div class="row">
+    <div class="form-group">
+      <label>Pincode <span class="req">*</span></label>
+      <input type="text" id="resPincode" placeholder="6-digit pincode">
+    </div>
+    <div></div>
+  </div>
+
+  <h3>Office Address <small style="font-weight:400;font-size:12px;">(Optional)</small></h3>
+  <div class="row">
+    <div class="form-group">
+      <label>Office Name</label>
+      <input type="text" id="officeName" placeholder="Office / Company Name">
+    </div>
+    <div class="form-group">
+      <label>Flat / Door / Block No</label>
+      <input type="text" id="officeFlatNo" placeholder="e.g. 3rd Floor">
+    </div>
+  </div>
+  <div class="row">
+    <div class="form-group">
+      <label>Road / Street</label>
+      <input type="text" id="officeRoad" placeholder="Road or Street">
+    </div>
+    <div class="form-group">
+      <label>Area / Locality</label>
+      <input type="text" id="officeLocality" placeholder="Area or Locality">
+    </div>
+  </div>
+  <div class="row">
+    <div class="form-group">
+      <label>Town / City</label>
+      <input type="text" id="officeCity" placeholder="Town or City">
+    </div>
+    <div class="form-group">
+      <label>District</label>
+      <select id="officeDistrict">
+        <option value="">Select District</option>
+        <option>Alappuzha</option><option>Ernakulam</option><option>Idukki</option>
+        <option>Kannur</option><option>Kasaragod</option><option>Kollam</option>
+        <option>Kottayam</option><option>Kozhikode</option><option>Malappuram</option>
+        <option>Palakkad</option><option>Pathanamthitta</option>
+        <option>Thiruvananthapuram</option><option>Thrissur</option><option>Wayanad</option>
+      </select>
+    </div>
+  </div>
+  <div class="row">
+    <div class="form-group">
+      <label>State</label>
+      <select id="officeStateAddr">
+        <option value="">Select State</option>
+        <option>Andhra Pradesh</option><option>Arunachal Pradesh</option>
+        <option>Assam</option><option>Bihar</option><option>Chhattisgarh</option>
+        <option>Goa</option><option>Gujarat</option><option>Haryana</option>
+        <option>Himachal Pradesh</option><option>Jharkhand</option>
+        <option>Karnataka</option><option>Kerala</option>
+        <option>Madhya Pradesh</option><option>Maharashtra</option>
+        <option>Manipur</option><option>Meghalaya</option><option>Mizoram</option>
+        <option>Nagaland</option><option>Odisha</option><option>Punjab</option>
+        <option>Rajasthan</option><option>Sikkim</option><option>Tamil Nadu</option>
+        <option>Telangana</option><option>Tripura</option>
+        <option>Uttar Pradesh</option><option>Uttarakhand</option>
+        <option>West Bengal</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Country</label>
+      <select id="officeCountry">
+        <option value="India">India</option>
+        <option value="USA">USA</option>
+        <option value="UK">UK</option>
+      </select>
+    </div>
+  </div>
+  <div class="row">
+    <div class="form-group">
+      <label>Pincode</label>
+      <input type="text" id="officePincode" placeholder="6-digit pincode">
+    </div>
+    <div></div>
+  </div>
+
+  <h3>Source of Income <span class="req">*</span></h3>
+  <div class="checkbox-grid">
+    <label><input type="checkbox" id="incomeSalary"> Salary</label>
+    <label><input type="checkbox" id="incomeCapitalGains"> Capital Gains</label>
+    <label><input type="checkbox" id="incomeHouseProperty"> Income from House Property</label>
+    <label><input type="checkbox" id="incomeOtherSources"> Income from Other Sources</label>
+    <label><input type="checkbox" id="incomeBusiness"> Business / Profession</label>
+    <label><input type="checkbox" id="incomeNone"> No Income</label>
+  </div>
+
+  <div class="nav">
+    <button class="btn-secondary" onclick="nextStep(3)">← Back</button>
+    <button class="btn-primary" onclick="nextStep(5)">Next →</button>
+  </div>
+</div>
+
+<!-- ===================== STEP 5: OTHER ===================== -->
+<div class="step" id="step5">
+  <p class="section-title">Other Details</p>
+
+  <h3>AO Code Details</h3>
+  <div class="row-4">
+    <div class="form-group">
+      <label>Area Code</label>
+      <input type="text" id="areaCode" placeholder="Area Code">
+    </div>
+    <div class="form-group">
+      <label>AO Type</label>
+      <input type="text" id="aoType" placeholder="AO Type">
+    </div>
+    <div class="form-group">
+      <label>Range Code</label>
+      <input type="text" id="rangeCode" placeholder="Range Code">
+    </div>
+    <div class="form-group">
+      <label>AO Number</label>
+      <input type="text" id="aoNumber" placeholder="AO Number">
+    </div>
+  </div>
+
+  <h3>Representative Assessee Address Details</h3>
+  <div class="row">
+    <div class="form-group">
+      <label>First Name</label>
+      <input type="text" id="repFirstName" placeholder="First Name">
+    </div>
+    <div class="form-group">
+      <label>Last Name / Surname</label>
+      <input type="text" id="repLastName" placeholder="Last Name">
+    </div>
+  </div>
+  <div class="row">
+    <div class="form-group">
+      <label>Flat / Door / Block No</label>
+      <input type="text" id="repFlatNo" placeholder="Flat No">
+    </div>
+    <div class="form-group">
+      <label>Name of Premises / Building</label>
+      <input type="text" id="repBuilding" placeholder="Building Name">
+    </div>
+  </div>
+  <div class="row">
+    <div class="form-group">
+      <label>Road / Street / Lane</label>
+      <input type="text" id="repRoad" placeholder="Road Name">
+    </div>
+    <div class="form-group">
+      <label>Area / Locality</label>
+      <input type="text" id="repLocality" placeholder="Locality">
+    </div>
+  </div>
+  <div class="row">
+    <div class="form-group">
+      <label>Town / City</label>
+      <input type="text" id="repCity" placeholder="City">
+    </div>
+    <div class="form-group">
+      <label>State</label>
+      <input type="text" id="repState" placeholder="State">
+    </div>
+  </div>
+  <div class="row">
+    <div class="form-group">
+      <label>Pincode</label>
+      <input type="text" id="repPincode" placeholder="Pincode">
+    </div>
+    <div></div>
+  </div>
+
+  <h3>Declaration</h3>
+  <div class="row">
+    <div class="form-group">
+      <label>I hereby declare this in capacity of <span class="req">*</span></label>
+      <select id="declaration">
+        <option value="Himself/Herself">Himself / Herself</option>
+        <option value="AuthorizedSignatory">Authorized Signatory</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Verifier Name</label>
+      <input type="text" id="verifierName" placeholder="Full Name of Verifier">
+    </div>
+  </div>
+  <div class="form-group">
+    <label>Place of Verification</label>
+    <input type="text" id="verificationPlace" placeholder="City / Place">
+  </div>
+
+  <div class="nav">
+    <button class="btn-secondary" onclick="nextStep(4)">← Back</button>
+    <button class="btn-primary" onclick="nextStep(6)">Next →</button>
+  </div>
+</div>
+
+<!-- ===================== STEP 6: UPLOAD ===================== -->
+<div class="step" id="step6">
+  <p class="section-title">Upload Documents</p>
+
+  <div class="info-box">
+    This facility is applicable only when PAN application is processed through Digital (DSC or eSign) mode.
+  </div>
+
+  <h3>Proof of Identity (POI)</h3>
+  <div class="upload-section">
+    <div class="form-group">
+      <label>Document Type</label>
+      <select id="uploadPOI">
+        <option value="Aadhaar">AADHAAR Card issued by UIDAI</option>
+        <option value="Passport">Passport</option>
+        <option value="VoterID">Voter ID</option>
+        <option value="DrivingLicense">Driving License</option>
+      </select>
+    </div>
+    <label>Upload File</label>
+    <input type="file" id="filePOI" accept=".jpg,.jpeg,.png,.pdf" onchange="showFileName('filePOI','statusPOI')">
+    <p class="file-hint">Accepted: JPG, PNG, PDF — Max 2MB</p>
+    <p class="file-status" id="statusPOI"></p>
+  </div>
+
+  <h3>Proof of Address (POA)</h3>
+  <div class="upload-section">
+    <div class="form-group">
+      <label>Document Type</label>
+      <select id="uploadPOA">
+        <option value="Aadhaar">AADHAAR Card issued by UIDAI</option>
+        <option value="BankStatement">Bank Statement</option>
+        <option value="Passport">Passport</option>
+      </select>
+    </div>
+    <label>Upload File</label>
+    <input type="file" id="filePOA" accept=".jpg,.jpeg,.png,.pdf" onchange="showFileName('filePOA','statusPOA')">
+    <p class="file-hint">Accepted: JPG, PNG, PDF — Max 2MB</p>
+    <p class="file-status" id="statusPOA"></p>
+  </div>
+
+  <h3>Date of Birth Proof</h3>
+  <div class="upload-section">
+    <div class="form-group">
+      <label>Document Type</label>
+      <select id="uploadDOB">
+        <option value="Aadhaar">AADHAAR Card issued by UIDAI</option>
+        <option value="BirthCert">Birth Certificate</option>
+        <option value="SSLC">SSLC Certificate</option>
+        <option value="Passport">Passport</option>
+      </select>
+    </div>
+    <label>Upload File</label>
+    <input type="file" id="fileDOB" accept=".jpg,.jpeg,.png,.pdf" onchange="showFileName('fileDOB','statusDOB')">
+    <p class="file-hint">Accepted: JPG, PNG, PDF — Max 2MB</p>
+    <p class="file-status" id="statusDOB"></p>
+  </div>
+
+  <h3>Applicant Photo & Signature</h3>
+  <div class="row">
+    <div class="upload-section">
+      <label>Applicant Photo <span class="req">*</span></label>
+      <input type="file" id="filePhoto" accept=".jpg,.jpeg,.png" onchange="showFileName('filePhoto','statusPhoto')">
+      <p class="file-hint">JPG/PNG — 213×213px — Max 30KB — 300 dpi colour</p>
+      <p class="file-status" id="statusPhoto"></p>
+    </div>
+    <div class="upload-section">
+      <label>Applicant Signature <span class="req">*</span></label>
+      <input type="file" id="fileSignature" accept=".jpg,.jpeg,.png" onchange="showFileName('fileSignature','statusSig')">
+      <p class="file-hint">JPG/PNG — Black & White — Max 60KB — 600 dpi</p>
+      <p class="file-status" id="statusSig"></p>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="btn-secondary" onclick="nextStep(5)">← Back</button>
+    <button class="btn-primary" onclick="nextStep(7)">Next →</button>
+  </div>
+</div>
+
+<!-- ===================== STEP 7: PAYMENT ===================== -->
+<div class="step" id="step7">
+  <p class="section-title">Payment Gateway</p>
+
+  <div class="payment-box">
+    <table>
+      <tr><td>Service</td><td>PAN Application (Form 49A)</td></tr>
+      <tr><td>Mode</td><td>Digital (eSign)</td></tr>
+      <tr><td>Applicant</td><td id="paymentName">—</td></tr>
+      <tr><td>Reference No</td><td id="paymentRef">—</td></tr>
+      <tr><td>Amount</td><td>₹ 106.90</td></tr>
+    </table>
+
+    <h3 style="background:none;color:#333;padding:0;margin-bottom:10px;">Select Payment Method</h3>
+    <label style="font-weight:400;display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+      <input type="radio" name="payMethod" id="payBillDesk" value="BillDesk" checked> BillDesk
+    </label>
+    <label style="font-weight:400;display:flex;gap:8px;align-items:center;margin-bottom:15px;">
+      <input type="radio" name="payMethod" id="payNetBanking" value="NetBanking"> Net Banking
+    </label>
+
+    <button class="btn-primary" id="payBtn" onclick="confirmPayment()">Confirm Payment</button>
+  </div>
+
+  <!-- FIX: id="paymentSuccess" starts display:none, set to block after payment -->
+  <div class="payment-success" id="paymentSuccess">
+    ✅ Payment Successful! Your PAN application has been submitted.<br>
+    <span id="successRef" style="font-size:13px;font-weight:400;"></span>
+  </div>
+
+  <div class="nav">
+    <button class="btn-secondary" onclick="nextStep(6)">← Back</button>
+  </div>
+</div>
+
+</div><!-- end container -->
+
+<script>
+// ===== REFERENCE NUMBER =====
+let referenceNumber = "REF" + Date.now();
+document.getElementById("refId").innerText = referenceNumber;
+document.getElementById("refDisplay").innerText = referenceNumber;
+document.getElementById("paymentRef").innerText = referenceNumber;
+
+// ===== POPUP =====
+function closePopup(){
+  document.getElementById("referencePopup").style.display = "none";
+}
+
+// ===== NAVIGATION =====
+function nextStep(step){
+  document.querySelectorAll(".step").forEach(s => s.classList.remove("active"));
+  document.getElementById("step" + step).classList.add("active");
+  updateProgress(step);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+
+  // Update payment summary when reaching step 7
+  if(step === 7){
+    const fn = document.getElementById("firstName").value;
+    const ln = document.getElementById("lastName").value;
+    if(fn || ln){
+      document.getElementById("paymentName").innerText = (fn + " " + ln).trim();
+    }
+  }
+}
+
+function prevStep(step){ nextStep(step); }
+
+// ===== PROGRESS INDICATOR =====
+function updateProgress(current){
+  for(let i = 1; i <= 7; i++){
+    let c = document.getElementById("c" + i);
+    c.classList.remove("active", "done");
+    if(i < current) c.classList.add("done");
+    else if(i === current) c.classList.add("active");
+  }
+}
+updateProgress(1);
+
+// ===== AADHAAR VERIFY (dummy) =====
+function verifyAadhaar(){
+  const val = document.getElementById("aadhaar").value.replace(/\s/g,"");
+  if(val.length === 12){
+    const fn = document.getElementById("firstName").value;
+    const ln = document.getElementById("lastName").value;
+    document.getElementById("aadhaarName").value = (fn + " " + ln).trim() || "Name from Aadhaar";
+    document.getElementById("aadhaarVerified").style.display = "block";
+  }
+}
+
+// ===== PAYMENT =====
+// FIX: Show paymentSuccess div with display:block so Puppeteer can detect it
+function confirmPayment(){
+  document.getElementById("payBtn").disabled = true;
+  document.getElementById("payBtn").innerText = "Processing...";
+  setTimeout(() => {
+    const successEl = document.getElementById("paymentSuccess");
+    successEl.style.display = "block";
+    document.getElementById("successRef").innerText = "Reference: " + referenceNumber;
+    document.getElementById("payBtn").innerText = "Paid ✔";
+  }, 1500);
+}
+
+// ===== AUTOFILL LISTENER =====
+window.autofillForm = function(data){
+  // Step 1
+  setValue("firstName",   data.first_name   || "");
+  setValue("middleName",  data.middle_name  || "");
+  setValue("lastName",    data.last_name    || "");
+  setValue("nameOnCard",  (data.first_name || "") + " " + (data.last_name || ""));
+  setSelect("gender",     data.gender       || "");
+  setValue("dob",         data.dob          || "");
+  setValue("aadhaar",     data.aadhaar_number || "");
+  setValue("aadhaarName", (data.first_name || "") + " " + (data.last_name || ""));
+  setSelect("residentState", data.residentState || data.state || "");
+
+  // Step 3
+  setValue("mobile", data.mobile || "");
+  setValue("email",  data.email  || "");
+
+  // Step 4 - Address
+  setValue("resLocality", data.locality || data.address || "");
+  setValue("resPincode",  data.pincode || "");
+  setSelect("resState",   data.residentState || data.state || "");
+
+  // Step 5
+  setValue("verifierName",       (data.first_name || "") + " " + (data.last_name || ""));
+  setValue("verificationPlace",  data.city || "");
+
+  console.log("✅ Autofill complete");
+  return "done";
+}
+
+function setValue(id, val){
+  const el = document.getElementById(id);
+  if(el) el.value = val;
+}
+
+// ===== FILE STATUS DISPLAY =====
+// Called by onchange AND by Puppeteer via page.evaluate after uploadFile()
+function showFileName(inputId, statusId){
+  const input = document.getElementById(inputId);
+  const status = document.getElementById(statusId);
+  if(!status) return;
+  if(input && input.files && input.files.length > 0){
+    const f = input.files[0];
+    const kb = (f.size / 1024).toFixed(1);
+    status.innerText = "✅ " + f.name + " (" + kb + " KB)";
+    status.style.color = "#2e7d32";
+  } else {
+    status.innerText = "";
+  }
+}
+
+// Puppeteer calls this after uploadFile() since the change event won't fire
+window.markFileUploaded = function(inputId, statusId, filename){
+  const status = document.getElementById(statusId);
+  if(status){
+    status.innerText = "✅ " + filename + " — uploaded";
+    status.style.color = "#2e7d32";
+  }
+}
+
+function setSelect(id, val){
+  const el = document.getElementById(id);
+  if(!el) return;
+  for(let i=0; i<el.options.length; i++){
+    if(el.options[i].value === val || el.options[i].text === val){
+      el.selectedIndex = i;
+      break;
+    }
+  }
+}
+</script>
+
+</body>
+</html>

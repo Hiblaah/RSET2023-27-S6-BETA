@@ -1,0 +1,99 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-dark: #030303;
+    --accent-purple: #7c3aed;
+    --accent-magenta: #d946ef;
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.08);
+  }
+
+  body {
+    @apply bg-brand-dark text-white antialiased;
+    background-image:
+      radial-gradient(circle at 50% -20%, #3b0764 0%, transparent 50%),
+      radial-gradient(circle at 0% 100%, #1e1b4b 0%, transparent 40%);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  .glass {
+    @apply backdrop-blur-xl bg-white/5 border border-white/10 shadow-xl;
+  }
+
+  .glass-dark {
+    @apply backdrop-blur-2xl bg-black/40 border border-white/5 shadow-2xl;
+  }
+
+  .neon-text-purple {
+    text-shadow: 0 0 10px rgba(124, 58, 237, 0.5);
+  }
+
+  .neon-border-magenta {
+    @apply border-accent-magenta/30;
+    box-shadow: 0 0 15px rgba(217, 70, 239, 0.2);
+  }
+}
+
+/* Custom Gradients for Background Streaks */
+.bg-streaks {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.streak-1 {
+  position: absolute;
+  width: 150%;
+  height: 50%;
+  bottom: -10%;
+  left: -25%;
+  background: radial-gradient(ellipse at center, rgba(217, 70, 239, 0.15) 0%, transparent 70%);
+  transform: rotate(-15deg);
+  filter: blur(80px);
+}
+
+.streak-2 {
+  position: absolute;
+  width: 150%;
+  height: 40%;
+  top: -10%;
+  right: -25%;
+  background: radial-gradient(ellipse at center, rgba(124, 58, 237, 0.1) 0%, transparent 70%);
+  transform: rotate(15deg);
+  filter: blur(80px);
+}
+
+/* Animations */
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out;
+}
+
+/* Scrollbar Hide */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

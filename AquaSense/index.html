@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AquaSense Pro</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+*{box-sizing:border-box;font-family:Inter,Arial,sans-serif}
+body{margin:0;background:#0b1220;color:#e5e7eb}
+body:not(.logged-in) .sidebar,body:not(.logged-in) .main{display:none}
+
+.sidebar{width:260px;height:100vh;background:linear-gradient(180deg,#0f172a,#020617);
+color:white;position:fixed;padding:20px;border-right:1px solid #1f2937;overflow-y:auto;z-index:100}
+.logo{font-size:20px;font-weight:bold;color:#38bdf8;margin-bottom:25px}
+.nav-item{padding:12px;border-radius:10px;margin-bottom:8px;cursor:pointer;transition:all .2s}
+.nav-item:hover,.nav-item.active{background:#1e293b;color:#38bdf8}
+
+.main{margin-left:260px;padding:20px 30px}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.badge{background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.4);
+padding:6px 14px;border-radius:20px;color:#38bdf8;font-weight:bold;font-size:13px}
+
+.card{background:linear-gradient(180deg,#111827,#020617);
+padding:18px;border-radius:16px;border:1px solid #1f2937;margin-bottom:20px}
+.section{display:none}
+#dashboard{display:block}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+#map{height:420px;border-radius:14px;border:1px solid #1f2937}
+
+/* LOGIN */
+.login-screen{position:fixed;inset:0;background:linear-gradient(135deg,#0f172a,#1e293b);
+display:flex;align-items:center;justify-content:center;z-index:9999}
+.login-box{background:#0f172a;padding:30px;width:360px;border-radius:16px;
+border:1px solid #334155;box-shadow:0 20px 50px rgba(0,0,0,.6)}
+input[type=text],input[type=password],input[type=email],input[type=number],input[type=datetime-local]{
+width:100%;padding:12px;margin-top:8px;border-radius:8px;
+border:1px solid #334155;background:#1e293b;color:white;outline:none;font-size:14px}
+input:focus{border-color:#38bdf8}
+button{padding:12px;border-radius:8px;border:none;font-weight:600;cursor:pointer;transition:all .2s}
+.primary-btn{background:#2563eb;color:white;width:100%}
+.primary-btn:hover{background:#1d4ed8}
+.sso-btn{background:#0ea5e9;color:white;width:100%}
+.link{color:#38bdf8;text-align:center;margin-top:10px;cursor:pointer;font-size:14px}
+.error{font-size:13px;margin-top:6px;min-height:18px}
+.field{position:relative;margin-bottom:4px}
+.eye{position:absolute;right:12px;top:58%;transform:translateY(-50%);cursor:pointer;font-size:18px;opacity:.7}
+.email-modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:99999}
+.email-box{background:#0f172a;width:380px;border-radius:14px;padding:25px;border:1px solid #334155}
+.email-item{display:flex;gap:12px;align-items:center;padding:10px;border-radius:10px;cursor:pointer;margin-top:10px;transition:background .2s}
+.email-item:hover{background:#1e293b}
+.avatar{width:36px;height:36px;border-radius:50%;background:#38bdf8;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#0f172a;flex-shrink:0}
+.email-id{font-size:13px;color:#94a3b8}
+
+/* SENSOR INPUTS */
+.sensor-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.sensor-field label{display:block;font-size:13px;color:#94a3b8;margin-bottom:6px;font-weight:600}
+.sensor-field input{margin-top:0;width:100%}
+.full-width{grid-column:1/-1}
+.range-warning{font-size:12px;margin-top:4px;display:none}
+.range-warning.show{display:block}
+
+/* RESULT */
+.result-box{display:none;padding:20px;border-radius:12px;border:1px solid;margin-top:16px;text-align:center}
+.result-box.show{display:block}
+.result-box.excellent{border-color:#22c55e;background:rgba(34,197,94,.08)}
+.result-box.good{border-color:#84cc16;background:rgba(132,204,22,.08)}
+.result-box.fair{border-color:#eab308;background:rgba(234,179,8,.08)}
+.result-box.poor{border-color:#f97316;background:rgba(249,115,22,.08)}
+.result-box.verypoor{border-color:#ef4444;background:rgba(239,68,68,.08)}
+.bod-value{font-size:42px;font-weight:800;line-height:1}
+.bod-unit{font-size:14px;color:#94a3b8;margin-top:2px}
+.bod-quality{font-size:18px;font-weight:700;margin-top:8px}
+.bod-desc{font-size:13px;color:#94a3b8;margin-top:4px}
+.model-info{font-size:11px;color:#4b5563;margin-top:10px}
+
+/* WARNINGS */
+.warning-box{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);
+border-radius:8px;padding:12px;margin-top:12px;display:none}
+.warning-box.show{display:block}
+.warning-box p{margin:3px 0;font-size:13px;color:#f59e0b}
+
+/* CONSECUTIVE ALERT */
+.consec-alert{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.4);
+border-radius:10px;padding:14px;margin-top:12px;display:none}
+.consec-alert.show{display:block}
+.consec-alert p{margin:0;font-size:14px;color:#ef4444;font-weight:600}
+
+/* LOADING */
+.loading{display:none;text-align:center;padding:20px;color:#38bdf8}
+.spinner{display:inline-block;width:24px;height:24px;border:3px solid rgba(56,189,248,.3);
+border-top-color:#38bdf8;border-radius:50%;animation:spin .8s linear infinite;margin-right:8px;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* TABLES */
+.history-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
+.history-table th{background:rgba(56,189,248,.1);color:#38bdf8;padding:8px 12px;text-align:left;
+border-bottom:1px solid #1f2937;font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+.history-table td{padding:8px 12px;border-bottom:1px solid #0f172a;vertical-align:middle}
+.history-table tr:hover td{background:rgba(255,255,255,.02)}
+.quality-badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+
+/* STAT CARDS */
+.stat-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+.stat-card{background:linear-gradient(180deg,#111827,#020617);border:1px solid #1f2937;
+border-radius:12px;padding:16px;text-align:center}
+.stat-value{font-size:26px;font-weight:800;color:#38bdf8}
+.stat-label{font-size:12px;color:#6b7280;margin-top:4px}
+
+/* ALERTS */
+.alert-item{display:flex;align-items:flex-start;gap:12px;padding:12px;border-radius:10px;margin-bottom:10px;border:1px solid}
+.alert-item.high{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.06)}
+.alert-item.medium{border-color:rgba(249,115,22,.4);background:rgba(249,115,22,.06)}
+.alert-item.low{border-color:rgba(234,179,8,.4);background:rgba(234,179,8,.06)}
+.alert-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:4px}
+
+/* TRENDS */
+.trend-controls{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.trend-btn{padding:6px 16px;border-radius:20px;border:1px solid #334155;
+background:transparent;color:#94a3b8;cursor:pointer;font-size:13px;transition:all .2s}
+.trend-btn.active{background:#1e293b;color:#38bdf8;border-color:#38bdf8}
+
+/* REPORTS */
+.report-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.report-stat{background:#0f172a;border:1px solid #1f2937;border-radius:10px;padding:16px}
+.report-stat .val{font-size:22px;font-weight:700;color:#38bdf8}
+.report-stat .lbl{font-size:12px;color:#6b7280;margin-top:2px}
+.download-section{background:#0f172a;border:1px solid #1f2937;border-radius:12px;padding:20px;margin-bottom:16px}
+.download-section h4{color:#38bdf8;margin:0 0 14px;font-size:15px}
+.date-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.date-row label{font-size:12px;color:#94a3b8;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.dl-btn{background:#1e3a5f;color:#38bdf8;border:1px solid #38bdf8;padding:10px 20px;
+border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;width:100%;margin-top:8px}
+.dl-btn:hover{background:#38bdf8;color:#0f172a}
+
+/* ALERT POPUP MODAL */
+.alert-popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:99998;animation:fadeInBg .25s ease}
+@keyframes fadeInBg{from{opacity:0}to{opacity:1}}
+.alert-popup{background:linear-gradient(160deg,#1c0808,#2d1010);border:2px solid #ef4444;border-radius:20px;
+padding:36px 32px;width:430px;max-width:92vw;text-align:center;
+box-shadow:0 0 80px rgba(239,68,68,.35),0 20px 60px rgba(0,0,0,.6);
+animation:popIn .35s cubic-bezier(.175,.885,.32,1.275)}
+@keyframes popIn{from{transform:scale(.75);opacity:0}to{transform:scale(1);opacity:1}}
+.alert-popup-icon{font-size:60px;display:block;margin-bottom:14px;animation:pulse 1.4s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.alert-popup h2{color:#ef4444;margin:0 0 6px;font-size:22px;font-weight:800}
+.alert-popup-loc{color:#fca5a5;font-size:13px;margin-bottom:18px;font-weight:600;letter-spacing:.3px}
+.alert-popup-days{font-size:52px;font-weight:900;color:#ef4444;line-height:1;margin:4px 0 2px}
+.alert-popup-days-label{font-size:13px;color:#9ca3af;margin-bottom:18px}
+.alert-popup-body{color:#e5e7eb;font-size:13px;line-height:1.65;
+background:rgba(239,68,68,.08);border-radius:10px;padding:13px 16px;
+border:1px solid rgba(239,68,68,.25);margin-bottom:22px;text-align:left}
+.alert-popup-body b{color:#fca5a5}
+.alert-popup-close{background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;
+padding:13px 32px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;width:100%;
+transition:all .2s;box-shadow:0 4px 20px rgba(239,68,68,.4)}
+.alert-popup-close:hover{transform:translateY(-2px);box-shadow:0 6px 25px rgba(239,68,68,.5)}
+.alert-popup-dismiss{color:#4b5563;font-size:12px;margin-top:12px;cursor:pointer;display:block}
+.alert-popup-dismiss:hover{color:#6b7280}
+</style>
+</head>
+<body id="body">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="logo">🌊 AquaSense Pro</div>
+  <div class="nav-item active" onclick="showSection('dashboard',this)">📊 Dashboard</div>
+  <div class="nav-item" onclick="showSection('smart',this)">🔬 Smart Water Quality</div>
+  <div class="nav-item" onclick="showSection('trends',this)">📈 Trends</div>
+  <div class="nav-item" onclick="showSection('alerts',this)">🚨 Alerts</div>
+  <div class="nav-item" onclick="showSection('reports',this)">📄 Reports</div>
+  <div class="nav-item" onclick="logout()" style="color:#ef4444">🚪 Logout</div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <h2 id="sectionTitle">Dashboard</h2>
+    <div class="badge" id="userBadge">Enterprise Monitoring Panel</div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard" class="section">
+    <div class="stat-cards">
+      <div class="stat-card"><div class="stat-value" id="statTotal">0</div><div class="stat-label">Total Predictions</div></div>
+      <div class="stat-card"><div class="stat-value" id="statAvgBOD">—</div><div class="stat-label">Avg BOD (mg/L)</div></div>
+      <div class="stat-card"><div class="stat-value" id="statGood">0</div><div class="stat-label">Good Quality Readings</div></div>
+      <div class="stat-card"><div class="stat-value" id="statAlerts">0</div><div class="stat-label">Active Alerts</div></div>
+    </div>
+    <div class="card">
+      <h3>📍 Chitrapuzha River, Kakkanad — Monitoring Map</h3>
+      <div id="map"></div>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <h3>📉 BOD Trend — Last 10 Readings</h3>
+        <p style="font-size:12px;color:#6b7280;margin:0 0 8px">Rising trend = worsening water quality.</p>
+        <canvas id="dashChart"></canvas>
+      </div>
+      <div class="card">
+        <h3>🕐 Recent Predictions</h3>
+        <table class="history-table">
+          <thead><tr><th>Time</th><th>BOD</th><th>Quality</th></tr></thead>
+          <tbody id="recentBody"><tr><td colspan="3" style="color:#4b5563;text-align:center;padding:20px">No predictions yet</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- SMART WATER QUALITY -->
+  <div id="smart" class="section">
+    <div class="card">
+      <h3>🔬 BOD Prediction — Sensor Input</h3>
+      <p style="color:#6b7280;font-size:13px;margin:8px 0 16px">Enter sensor readings. Values outside normal range will show a warning but prediction will still proceed.</p>
+      <div class="sensor-grid">
+        <div class="sensor-field">
+          <label>pH</label>
+          <input type="number" id="inp_ph" placeholder="e.g. 7.2" step="0.1" oninput="checkRange(this,'warn_ph')">
+          <div class="range-warning" id="warn_ph"></div>
+        </div>
+        <div class="sensor-field">
+          <label>Temperature (°C)</label>
+          <input type="number" id="inp_temp" placeholder="e.g. 22.5" step="0.1" oninput="checkRange(this,'warn_temp')">
+          <div class="range-warning" id="warn_temp"></div>
+        </div>
+        <div class="sensor-field">
+          <label>Conductivity (µS/cm)</label>
+          <input type="number" id="inp_cond" placeholder="e.g. 450" step="1" oninput="checkRange(this,'warn_cond')">
+          <div class="range-warning" id="warn_cond"></div>
+        </div>
+        <div class="sensor-field">
+          <label>Dissolved Oxygen (mg/L)</label>
+          <input type="number" id="inp_do" placeholder="e.g. 8.1" step="0.1" oninput="checkRange(this,'warn_do')">
+          <div class="range-warning" id="warn_do"></div>
+        </div>
+        <div class="sensor-field">
+          <label>Nitrate + Nitrite (mg/L)</label>
+          <input type="number" id="inp_nitrate" placeholder="e.g. 2.3" step="0.1" oninput="checkRange(this,'warn_nitrate')">
+          <div class="range-warning" id="warn_nitrate"></div>
+        </div>
+        <div class="sensor-field">
+          <label>Turbidity (NTU)</label>
+          <input type="number" id="inp_turbidity" placeholder="e.g. 12.4" step="0.1" oninput="checkRangeTurb(this)">
+          <div class="range-warning" id="warn_turbidity"></div>
+        </div>
+        <div class="sensor-field full-width">
+          <label>Location</label>
+          <select id="inp_location" style="width:100%;padding:12px;border-radius:8px;border:1px solid #334155;background:#1e293b;color:white;font-size:14px;margin-top:0">
+            <option>Chitrapuzha River — Near College</option>
+            <option>Chitrapuzha River — Upstream</option>
+            <option>Chitrapuzha River — Downstream</option>
+            <option>Other — Kakkanad, Kochi</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px">
+        <button class="primary-btn" onclick="predictBOD()" style="flex:2">🔬 Predict BOD</button>
+        <button onclick="clearInputs()" style="flex:1;background:#1e293b;color:#94a3b8;border:1px solid #334155;width:auto">🔄 Clear</button>
+      </div>
+      <div class="loading" id="loadingBox"><span class="spinner"></span> Querying ML model...</div>
+      <div class="warning-box" id="warningBox"></div>
+      <div class="consec-alert" id="consecAlert"></div>
+      <div class="result-box" id="resultBox">
+        <div class="bod-value" id="bodValue">—</div>
+        <div class="bod-unit">mg/L BOD</div>
+        <div class="bod-quality" id="bodQuality"></div>
+        <div class="bod-desc" id="bodDesc"></div>
+        <div class="model-info" id="modelInfo"></div>
+      </div>
+      <div id="smartError" style="display:none;color:#ef4444;margin-top:12px;font-size:13px;
+        padding:10px;background:rgba(239,68,68,.08);border-radius:8px;border:1px solid rgba(239,68,68,.2)"></div>
+    </div>
+    <div class="card">
+      <h3>📋 Prediction History <span style="font-size:12px;color:#6b7280;font-weight:400">— saved permanently to PC</span></h3>
+      <table class="history-table">
+        <thead><tr><th>Date</th><th>Time</th><th>User</th><th>Location</th><th>pH</th><th>Temp</th><th>DO</th><th>Nitrate</th><th>Cond.</th><th>Turbidity</th><th>BOD</th><th>Quality</th></tr></thead>
+        <tbody id="historyBody"><tr><td colspan="12" style="color:#4b5563;text-align:center;padding:20px">Loading history...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TRENDS -->
+  <div id="trends" class="section">
+    <div class="card">
+      <h3>📈 Parameter Trends Over Time</h3>
+      <p style="font-size:12px;color:#6b7280;margin:0 0 12px">Select a parameter to see how it changes across all recorded readings.</p>
+      <div class="trend-controls">
+        <button class="trend-btn active" onclick="setTrendView('BOD',this)">BOD</button>
+        <button class="trend-btn" onclick="setTrendView('pH',this)">pH</button>
+        <button class="trend-btn" onclick="setTrendView('DO',this)">Dissolved O₂</button>
+        <button class="trend-btn" onclick="setTrendView('Temperature',this)">Temperature</button>
+        <button class="trend-btn" onclick="setTrendView('Nitrate',this)">Nitrate</button>
+        <button class="trend-btn" onclick="setTrendView('Conductivity',this)">Conductivity</button>
+      </div>
+      <canvas id="trendChart" height="110"></canvas>
+    </div>
+    <div class="card">
+      <h3>📊 Water Quality Distribution</h3>
+      <canvas id="distChart" height="90"></canvas>
+    </div>
+  </div>
+
+  <!-- ALERTS -->
+  <div id="alerts" class="section">
+    <div class="card">
+      <h3>🚨 Water Quality Alerts</h3>
+      <p style="font-size:13px;color:#6b7280;margin:0 0 16px">Persistent alert raised when water quality is Fair or worse for 2+ consecutive days at the same location.</p>
+      <div id="alertBox"><p style="color:#4b5563">No alerts yet.</p></div>
+    </div>
+  </div>
+
+  <!-- REPORTS -->
+  <div id="reports" class="section">
+    <div class="card">
+      <h3>📄 Summary Statistics</h3>
+      <div class="report-grid" id="reportStats"><p style="color:#4b5563">No data yet.</p></div>
+    </div>
+    <div class="card">
+      <h3>⬇️ Download Reports</h3>
+      <div class="download-section">
+        <h4>Download All Records</h4>
+        <p style="font-size:13px;color:#6b7280;margin:0 0 12px">Export every reading ever recorded across all sessions.</p>
+        <button class="dl-btn" onclick="downloadCSV()">⬇️ Download All History</button>
+      </div>
+      <div class="download-section">
+        <h4>Download by Date & Time Range</h4>
+        <p style="font-size:13px;color:#6b7280;margin:0 0 12px">Filter records between specific start and end times.</p>
+        <div class="date-row">
+          <div><label>Start Date & Time</label><input type="datetime-local" id="startDT"></div>
+          <div><label>End Date & Time</label><input type="datetime-local" id="endDT"></div>
+        </div>
+        <button class="dl-btn" onclick="downloadFiltered()">⬇️ Download Filtered Range</button>
+      </div>
+      <p id="reportStatus" style="font-size:13px;color:#22c55e;margin-top:8px"></p>
+    </div>
+  </div>
+</div>
+
+<!-- CONSECUTIVE DAY ALERT POPUP -->
+<div id="alertPopupOverlay" class="alert-popup-overlay" style="display:none" onclick="closeAlertPopup(event)">
+  <div class="alert-popup">
+    <span class="alert-popup-icon">🚨</span>
+    <h2>Water Quality Alert</h2>
+    <div class="alert-popup-loc" id="alertPopupLoc"></div>
+    <div class="alert-popup-days" id="alertPopupDays"></div>
+    <div class="alert-popup-days-label">consecutive days of poor water quality</div>
+    <div class="alert-popup-body" id="alertPopupBody"></div>
+    <button class="alert-popup-close" onclick="closeAlertPopupBtn()">✓ Acknowledge Alert</button>
+    <span class="alert-popup-dismiss" onclick="closeAlertPopupBtn()">Dismiss — I'll check later</span>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <h2 id="authTitle" style="color:#38bdf8;margin-bottom:8px">Login to AquaSense</h2>
+    <p style="color:#6b7280;font-size:13px;margin-bottom:4px">Chitrapuzha River Monitoring System</p>
+    <div class="field"><input type="text" id="username" placeholder="Username"></div>
+    <div class="field" id="emailField" style="display:none">
+      <input type="email" id="email" placeholder="yourname@gmail.com">
+    </div>
+    <div class="field">
+      <input type="password" id="password" placeholder="Password">
+      <span id="togglePwd" class="eye" onclick="togglePassword()">👁</span>
+    </div>
+    <div id="errorMsg" class="error"></div>
+    <button class="primary-btn" style="margin-top:12px" onclick="handleAuth()">Login</button>
+    <button class="sso-btn" style="margin-top:8px" onclick="handleEmailBtn()">Login with Email</button>
+    <div class="link" onclick="handleToggleAuth()">Create account</div>
+  </div>
+</div>
+
+<!-- EMAIL PICKER -->
+<div id="emailModal" class="email-modal" onclick="closeEmailModal(event)">
+  <div class="email-box" id="emailList"></div>
+</div>
+
+<script>
+
+// ═══════════════════════════════════════════════════════════
+// AUTH HELPERS — accounts saved to users.json via Flask
+// Works across any browser/device on the same network
+// ═══════════════════════════════════════════════════════════
+function validPassword(p){
+  return p.length>=8 && /[A-Z]/.test(p) && /[a-z]/.test(p) && /[0-9]/.test(p) && /[^A-Za-z0-9]/.test(p);
+}
+
+function validateGmail(email){
+  email = email.trim().toLowerCase();
+  if(!email.endsWith('@gmail.com'))
+    return 'Email must be a Gmail address ending in @gmail.com';
+  const local = email.split('@')[0];
+  if(local.length < 6)  return 'Gmail username must be at least 6 characters';
+  if(local.length > 30) return 'Gmail username must be 30 characters or fewer';
+  if(!/^[a-z0-9.]+$/.test(local))
+    return 'Gmail username can only contain letters, numbers, and dots';
+  if(local.startsWith('.') || local.endsWith('.'))
+    return 'Gmail username cannot start or end with a dot';
+  if(local.includes('..'))
+    return 'Gmail username cannot have consecutive dots';
+  return null;
+}
+
+let isRegister = false;
+let currentUser = '';
+const shownAlerts = new Set(); // tracks alert keys already shown this session
+
+function togglePassword(){
+  const pwd = document.getElementById('password');
+  const eye = document.getElementById('togglePwd');
+  pwd.type = pwd.type==='password' ? 'text' : 'password';
+  eye.textContent = pwd.type==='password' ? '👁' : '🙈';
+}
+
+function handleToggleAuth(){
+  isRegister = !isRegister;
+  document.getElementById('authTitle').innerText = isRegister ? 'Create AquaSense Account' : 'Login to AquaSense';
+  document.querySelector('.primary-btn').innerText = isRegister ? 'Register' : 'Login';
+  document.getElementById('emailField').style.display = isRegister ? 'block' : 'none';
+  document.querySelector('.link').innerText = isRegister ? 'Already have account? Login' : 'Create account';
+  setError('');
+}
+
+function setError(msg, isSuccess){
+  const el = document.getElementById('errorMsg');
+  el.style.color = isSuccess ? '#22c55e' : '#ef4444';
+  el.innerText = msg;
+}
+
+async function handleAuth(){
+  const u = document.getElementById('username').value.trim();
+  const p = document.getElementById('password').value;
+  const e = document.getElementById('email').value.trim();
+
+  if(isRegister){
+    if(!u||!e||!p){ setError('Please fill in all fields'); return; }
+    const gmailErr = validateGmail(e);
+    if(gmailErr){ setError(gmailErr); return; }
+    if(!validPassword(p)){ setError('Password needs 8+ chars, uppercase, lowercase, number and symbol'); return; }
+    setError('Creating account...');
+    try{
+      const res  = await fetch('/register',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:u,email:e.toLowerCase(),password:p}) });
+      const data = await res.json();
+      if(!res.ok){ setError(data.error||'Registration failed'); return; }
+      setError('Account created! Please login.', true);
+      handleToggleAuth();
+    } catch(err){ setError('Cannot connect to server. Is app.py running?'); }
+    return;
+  }
+
+  if(!u||!p){ setError('Please enter username and password'); return; }
+  setError('Logging in...');
+  try{
+    const res  = await fetch('/login',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:u,password:p}) });
+    const data = await res.json();
+    if(!res.ok){ setError(data.error||'Login failed'); return; }
+    loginSuccess(data.username);
+  } catch(err){ setError('Cannot connect to server. Is app.py running?'); }
+}
+
+async function handleEmailBtn(){
+  try{
+    const res   = await fetch('/users');
+    const users = await res.json();
+    const box   = document.getElementById('emailList');
+    box.innerHTML = '<h3 style="color:#e5e7eb;margin:0 0 4px">Select account</h3>';
+    if(!users.length){
+      box.innerHTML += '<p style="color:#6b7280;margin-top:12px">No accounts found. Please register first.</p>';
+    }
+    users.forEach(u=>{
+      const item = document.createElement('div');
+      item.className = 'email-item';
+      item.onclick = ()=>{
+        document.getElementById('username').value = u.username;
+        document.getElementById('emailModal').style.display = 'none';
+        document.getElementById('password').focus();
+      };
+      item.innerHTML = `<div class="avatar">${u.username[0].toUpperCase()}</div>
+        <div><div style="font-size:14px">${u.username}</div><div class="email-id">${u.email}</div></div>`;
+      box.appendChild(item);
+    });
+    const add = document.createElement('div');
+    add.className = 'email-item';
+    add.innerHTML = '<div>➕ Use another account</div>';
+    add.onclick = ()=>{ document.getElementById('emailModal').style.display='none'; isRegister=false; handleToggleAuth(); };
+    box.appendChild(add);
+    document.getElementById('emailModal').style.display = 'flex';
+  } catch(err){ setError('Cannot connect to server. Is app.py running?'); }
+}
+
+function closeEmailModal(e){
+  if(e.target===document.getElementById('emailModal'))
+    document.getElementById('emailModal').style.display='none';
+}
+
+function loginSuccess(uname){
+  currentUser = uname;
+  document.getElementById('userBadge').innerText = '👤 ' + uname;
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('body').classList.add('logged-in');
+  setTimeout(()=>{ if(map) map.invalidateSize(); }, 400);
+  loadHistoryFromServer();
+  updateDashboard();
+}
+
+function logout(){
+  currentUser = '';
+  shownAlerts.clear();
+  document.getElementById('body').classList.remove('logged-in');
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('username').value = '';
+  document.getElementById('password').value = '';
+  setError('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════
+function showSection(id, el){
+  document.querySelectorAll('.section').forEach(s=>s.style.display='none');
+  document.getElementById(id).style.display = 'block';
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('sectionTitle').innerText = el.textContent.replace(/[^\w\s]/gi,'').trim();
+  if(id==='trends') renderTrendCharts();
+  if(id==='reports') renderReportStats();
+  if(id==='alerts') renderAlerts();
+}
+
+// ═══════════════════════════════════════════════════════════
+// MAP
+// ═══════════════════════════════════════════════════════════
+var map = null;
+var stationMarkers = {};
+
+window.addEventListener('load', function(){
+  map = L.map('map').setView([10.0158, 76.3419], 14);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution:'© OpenStreetMap contributors'
+  }).addTo(map);
+  const stations = [
+    {name:'Chitrapuzha River — Near College', lat:10.0120, lng:76.3350, desc:'Primary monitoring point'},
+    {name:'Chitrapuzha River — Upstream',     lat:10.0200, lng:76.3280, desc:'Upstream reference point'},
+    {name:'Chitrapuzha River — Downstream',   lat:10.0050, lng:76.3450, desc:'Downstream outflow point'},
+  ];
+  stations.forEach(s=>{
+    const marker = L.circleMarker([s.lat,s.lng],{
+      radius:10, fillColor:'#38bdf8', color:'white', weight:2, fillOpacity:.85
+    }).addTo(map);
+    marker.bindPopup(`<b>${s.name}</b><br>${s.desc}<br>No data yet`);
+    stationMarkers[s.name] = marker;
+  });
+  L.marker([10.0158, 76.3419]).addTo(map)
+    .bindPopup('<b>📍 Your College — Kakkanad, Kochi</b><br>Ernakulam District, Kerala')
+    .openPopup();
+});
+
+// ═══════════════════════════════════════════════════════════
+// QUALITY CONFIG
+// ═══════════════════════════════════════════════════════════
+const QC = {
+  'Excellent':{ cls:'excellent', color:'#22c55e', desc:'Very clean water — safe for all uses',         badgeBg:'rgba(34,197,94,.15)',  badgeColor:'#22c55e' },
+  'Good'     :{ cls:'good',      color:'#84cc16', desc:'Clean water — suitable for most uses',         badgeBg:'rgba(132,204,22,.15)', badgeColor:'#84cc16' },
+  'Fair'     :{ cls:'fair',      color:'#eab308', desc:'Slightly polluted — treatment recommended',    badgeBg:'rgba(234,179,8,.15)',  badgeColor:'#eab308' },
+  'Poor'     :{ cls:'poor',      color:'#f97316', desc:'Polluted — not safe without treatment',        badgeBg:'rgba(249,115,22,.15)', badgeColor:'#f97316' },
+  'Very Poor':{ cls:'verypoor',  color:'#ef4444', desc:'Heavily polluted — immediate action required', badgeBg:'rgba(239,68,68,.15)',  badgeColor:'#ef4444' },
+};
+
+// ═══════════════════════════════════════════════════════════
+// HISTORY
+// ═══════════════════════════════════════════════════════════
+let predictionHistory = [];
+
+async function loadHistoryFromServer(){
+  try{
+    const res = await fetch('/history');
+    predictionHistory = await res.json();
+    updateHistoryTable();
+    updateDashboard();
+    renderAlerts();
+  } catch(e){ console.log('Could not load history:', e); }
+}
+
+// ═══════════════════════════════════════════════════════════
+// RANGE CHECKS
+// ═══════════════════════════════════════════════════════════
+const IMPOSSIBLE = { warn_ph:[0,14], warn_temp:[0,50], warn_cond:[0,50000], warn_do:[0,18], warn_nitrate:[0,1000] };
+const NORMAL     = { warn_ph:[4,10], warn_temp:[5,40], warn_cond:[10,5000], warn_do:[0.5,14], warn_nitrate:[0,50] };
+
+function checkRange(input, warnId){
+  const val  = parseFloat(input.value);
+  const warn = document.getElementById(warnId);
+  if(isNaN(val)){ warn.classList.remove('show'); input.style.borderColor=''; return; }
+  const [ilo,ihi] = IMPOSSIBLE[warnId];
+  const [nlo,nhi] = NORMAL[warnId];
+  if(val < ilo || val > ihi){
+    warn.textContent = `❌ Physically impossible value (valid: ${ilo}–${ihi})`;
+    warn.style.color = '#ef4444'; warn.classList.add('show'); input.style.borderColor='#ef4444';
+  } else if(val < nlo || val > nhi){
+    warn.textContent = `⚠️ Outside normal river range (${nlo}–${nhi}) — prediction may be less accurate`;
+    warn.style.color = '#f59e0b'; warn.classList.add('show'); input.style.borderColor='#f59e0b';
+  } else { warn.classList.remove('show'); input.style.borderColor=''; }
+}
+
+function checkRangeTurb(input){
+  const val  = parseFloat(input.value);
+  const warn = document.getElementById('warn_turbidity');
+  if(isNaN(val)){ warn.classList.remove('show'); input.style.borderColor=''; return; }
+  if(val < 0 || val > 4000){
+    warn.textContent = `❌ Physically impossible value for a river (valid: 0–4,000 NTU)`;
+    warn.style.color='#ef4444'; warn.classList.add('show'); input.style.borderColor='#ef4444';
+  } else if(val > 1000){
+    warn.textContent = `⚠️ Extremely high turbidity — only seen in severe flood/pollution events`;
+    warn.style.color='#f59e0b'; warn.classList.add('show'); input.style.borderColor='#f59e0b';
+  } else { warn.classList.remove('show'); input.style.borderColor=''; }
+}
+
+// ═══════════════════════════════════════════════════════════
+// BOD PREDICTION
+// ═══════════════════════════════════════════════════════════
+async function predictBOD(){
+  const ph       = document.getElementById('inp_ph').value.trim();
+  const temp     = document.getElementById('inp_temp').value.trim();
+  const cond     = document.getElementById('inp_cond').value.trim();
+  const doVal    = document.getElementById('inp_do').value.trim();
+  const nitrate  = document.getElementById('inp_nitrate').value.trim();
+  const turb     = document.getElementById('inp_turbidity').value.trim();
+  const location = document.getElementById('inp_location').value;
+
+  if(!ph||!temp||!cond||!doVal||!nitrate){ showSmartError('Please fill in all 5 sensor fields.'); return; }
+
+  const impossibleShown = ['warn_ph','warn_temp','warn_cond','warn_do','warn_nitrate','warn_turbidity']
+    .some(id=>{ const el=document.getElementById(id); return el && el.classList.contains('show') && el.style.color==='rgb(239, 68, 68)'; });
+  if(impossibleShown){ showSmartError('Please correct the fields marked in red before predicting.'); return; }
+
+  hideSmartError();
+  document.getElementById('loadingBox').style.display = 'block';
+  document.getElementById('resultBox').classList.remove('show');
+  document.getElementById('warningBox').classList.remove('show');
+  document.getElementById('consecAlert').classList.remove('show');
+
+  try{
+    const response = await fetch('/predict',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        pH:parseFloat(ph), Temperature:parseFloat(temp),
+        Conductivity:parseFloat(cond), DO:parseFloat(doVal),
+        Nitrate:parseFloat(nitrate),
+        turbidity: turb ? parseFloat(turb) : null,
+        username: currentUser,
+        location
+      })
+    });
+    const data = await response.json();
+    document.getElementById('loadingBox').style.display = 'none';
+    if(!response.ok){ showSmartError(data.error||'Prediction failed.'); return; }
+
+    if(data.warnings && data.warnings.length){
+      const wb = document.getElementById('warningBox');
+      wb.innerHTML = data.warnings.map(w=>`<p>⚠️ ${w}</p>`).join('');
+      wb.classList.add('show');
+    }
+    if(data.consecutive_alert){
+      const ca = document.getElementById('consecAlert');
+      ca.innerHTML = `<p>${data.consecutive_alert.message}</p>`;
+      ca.classList.add('show');
+      // Only show popup if this alert hasn't been acknowledged yet this session
+      const alertKey = (data.consecutive_alert.location||'') + '_' + data.consecutive_alert.consecutive_days;
+      if(!shownAlerts.has(alertKey)){
+        showAlertPopup(data.consecutive_alert, alertKey);
+      }
+    }
+
+    const cfg = QC[data.quality] || QC['Fair'];
+    const box = document.getElementById('resultBox');
+    box.className = `result-box show ${cfg.cls}`;
+    document.getElementById('bodValue').textContent = data.bod.toFixed(2);
+    document.getElementById('bodValue').style.color = cfg.color;
+    document.getElementById('bodQuality').textContent = `${data.quality} Water Quality`;
+    document.getElementById('bodQuality').style.color = cfg.color;
+    document.getElementById('bodDesc').textContent = cfg.desc;
+    document.getElementById('modelInfo').textContent = `Random Forest ML Model · R²=${data.model_r2} · ${location}`;
+
+    predictionHistory.unshift(data.entry);
+    updateHistoryTable();
+    updateDashboard();
+    renderAlerts();
+    updateMapMarker(location, data.bod, data.quality, cfg.color);
+
+  } catch(err){
+    document.getElementById('loadingBox').style.display = 'none';
+    showSmartError('Cannot connect to Flask server. Make sure app.py is running.');
+  }
+}
+
+function showSmartError(msg){ const el=document.getElementById('smartError'); el.style.display='block'; el.textContent=msg; }
+function hideSmartError(){ document.getElementById('smartError').style.display='none'; }
+
+function clearInputs(){
+  ['inp_ph','inp_temp','inp_cond','inp_do','inp_nitrate','inp_turbidity'].forEach(id=>{
+    const el=document.getElementById(id); if(el){el.value='';el.style.borderColor='';}
+  });
+  ['warn_ph','warn_temp','warn_cond','warn_do','warn_nitrate','warn_turbidity'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.classList.remove('show');
+  });
+  document.getElementById('resultBox').classList.remove('show');
+  document.getElementById('warningBox').classList.remove('show');
+  document.getElementById('consecAlert').classList.remove('show');
+  hideSmartError();
+}
+
+function updateMapMarker(location, bod, quality, color){
+  if(stationMarkers[location]){
+    stationMarkers[location].setStyle({fillColor:color});
+    stationMarkers[location].setPopupContent(`<b>${location}</b><br>Latest BOD: <b>${bod} mg/L</b><br>Quality: <b>${quality}</b>`);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// HISTORY TABLE
+// ═══════════════════════════════════════════════════════════
+function updateHistoryTable(){
+  const tbody = document.getElementById('historyBody');
+  if(!predictionHistory.length){
+    tbody.innerHTML = '<tr><td colspan="12" style="color:#4b5563;text-align:center;padding:20px">No predictions yet</td></tr>';
+    return;
+  }
+  tbody.innerHTML = predictionHistory.map(e=>{
+    const cfg = QC[e.quality] || QC['Fair'];
+    return `<tr>
+      <td style="color:#6b7280">${e.date||''}</td>
+      <td style="color:#6b7280">${e.time||''}</td>
+      <td style="color:#38bdf8;font-size:12px">${e.username||'—'}</td>
+      <td style="font-size:12px">${(e.location||'').replace('Chitrapuzha River — ','')}</td>
+      <td>${e.pH||''}</td>
+      <td>${e.Temperature||''}°C</td>
+      <td>${e.DO||''}</td>
+      <td>${e.Nitrate||''}</td>
+      <td>${e.Conductivity||'—'}</td>
+      <td>${e.Turbidity!=null?e.Turbidity:'—'}</td>
+      <td style="font-weight:700;color:${cfg.color}">${(e.BOD||e.bod||0).toFixed(2)}</td>
+      <td><span class="quality-badge" style="background:${cfg.badgeBg};color:${cfg.badgeColor}">${e.quality}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════════
+let dashChartInst = null;
+function updateDashboard(){
+  const total  = predictionHistory.length;
+  const good   = predictionHistory.filter(e=>e.level<=2).length;
+  const avg    = total ? (predictionHistory.reduce((s,e)=>s+(e.BOD||e.bod||0),0)/total).toFixed(2) : '—';
+  const alerts = predictionHistory.filter(e=>e.level>=3).length;
+  document.getElementById('statTotal').textContent  = total;
+  document.getElementById('statAvgBOD').textContent = avg;
+  document.getElementById('statGood').textContent   = good;
+  document.getElementById('statAlerts').textContent = alerts;
+
+  const rb = document.getElementById('recentBody');
+  if(!total){
+    rb.innerHTML = '<tr><td colspan="3" style="color:#4b5563;text-align:center;padding:20px">No predictions yet</td></tr>';
+  } else {
+    rb.innerHTML = predictionHistory.slice(0,5).map(e=>{
+      const cfg = QC[e.quality]||QC['Fair'];
+      return `<tr>
+        <td style="color:#6b7280">${e.time||''}</td>
+        <td style="font-weight:700;color:${cfg.color}">${(e.BOD||e.bod||0).toFixed(2)} mg/L</td>
+        <td><span class="quality-badge" style="background:${cfg.badgeBg};color:${cfg.badgeColor}">${e.quality}</span></td>
+      </tr>`;
+    }).join('');
+  }
+
+  const last10 = [...predictionHistory].slice(0,10).reverse();
+  const ctx = document.getElementById('dashChart').getContext('2d');
+  if(dashChartInst) dashChartInst.destroy();
+  dashChartInst = new Chart(ctx,{
+    type:'line',
+    data:{
+      labels: last10.map(e=>e.time||''),
+      datasets:[{ label:'BOD (mg/L)', data:last10.map(e=>e.BOD||e.bod||0),
+        borderColor:'#38bdf8', fill:true, backgroundColor:'rgba(56,189,248,.08)',
+        tension:.4, pointRadius:4, pointBackgroundColor:'#38bdf8' }]
+    },
+    options:{ responsive:true, plugins:{legend:{labels:{color:'#94a3b8'}}},
+      scales:{ x:{ticks:{color:'#4b5563'},grid:{color:'#1f2937'}},
+               y:{ticks:{color:'#4b5563'},grid:{color:'#1f2937'},title:{display:true,text:'BOD (mg/L)',color:'#6b7280'},beginAtZero:true} } }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// ALERTS
+// ═══════════════════════════════════════════════════════════
+function renderAlerts(){
+  const container = document.getElementById('alertBox');
+  const badReadings = predictionHistory.filter(e=>e.level>=3);
+  if(!badReadings.length){ container.innerHTML='<p style="color:#4b5563">No alerts. All readings within acceptable range.</p>'; return; }
+
+  const locations = [...new Set(predictionHistory.map(e=>e.location))];
+  let consecHtml = '';
+  locations.forEach(loc=>{
+    const locDates = predictionHistory.filter(e=>e.location===loc && e.level>=3).map(e=>e.date);
+    const uniqueDates = [...new Set(locDates)].sort().reverse();
+    let streak = 1;
+    for(let i=1;i<uniqueDates.length;i++){
+      const d1=new Date(uniqueDates[i-1]), d2=new Date(uniqueDates[i]);
+      if((d1-d2)/(1000*60*60*24)===1) streak++; else break;
+    }
+    if(streak>=2){
+      consecHtml += `<div class="alert-item high">
+        <div class="alert-dot" style="background:#ef4444"></div>
+        <div>
+          <div style="font-weight:700;font-size:14px">🚨 Persistent Alert — ${loc}</div>
+          <div style="font-size:12px;color:#6b7280">Water quality has been Fair or worse for ${streak} consecutive days. Immediate investigation recommended.</div>
+        </div>
+      </div>`;
+    }
+  });
+
+  const alertHtml = badReadings.map(e=>{
+    const lvl = e.level>=5?'high':e.level===4?'medium':'low';
+    const dot = e.level>=5?'#ef4444':e.level===4?'#f97316':'#eab308';
+    return `<div class="alert-item ${lvl}">
+      <div class="alert-dot" style="background:${dot}"></div>
+      <div>
+        <div style="font-weight:600;font-size:14px">${e.quality} Water Quality Alert</div>
+        <div style="font-size:12px;color:#6b7280">BOD = ${(e.BOD||e.bod||0).toFixed(2)} mg/L · ${e.date||''} ${e.time||''} · ${e.location||''}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  container.innerHTML = consecHtml + alertHtml;
+}
+
+// ═══════════════════════════════════════════════════════════
+// TRENDS
+// ═══════════════════════════════════════════════════════════
+let trendChartInst=null, distChartInst=null, currentTrendView='BOD';
+
+function setTrendView(view, btn){
+  currentTrendView = view;
+  document.querySelectorAll('.trend-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTrendCharts();
+}
+
+function renderTrendCharts(){
+  if(!predictionHistory.length) return;
+  const data   = [...predictionHistory].reverse();
+  const labels = data.map(e=>e.time||'');
+  const colorMap = {BOD:'#38bdf8',pH:'#a78bfa',DO:'#34d399',Temperature:'#fb923c',Nitrate:'#f472b6',Conductivity:'#fbbf24'};
+  const keyMap   = {BOD:e=>e.BOD||e.bod||0, pH:e=>e.pH, DO:e=>e.DO, Temperature:e=>e.Temperature, Nitrate:e=>e.Nitrate, Conductivity:e=>e.Conductivity};
+  const color  = colorMap[currentTrendView]||'#38bdf8';
+  const values = data.map(keyMap[currentTrendView]||(()=>0));
+  const ctx1 = document.getElementById('trendChart').getContext('2d');
+  if(trendChartInst) trendChartInst.destroy();
+  trendChartInst = new Chart(ctx1,{
+    type:'line',
+    data:{labels, datasets:[{label:currentTrendView, data:values, borderColor:color, backgroundColor:color+'18', fill:true, tension:.4, pointRadius:3}]},
+    options:{responsive:true, plugins:{legend:{labels:{color:'#94a3b8'}}},
+      scales:{x:{ticks:{color:'#4b5563'},grid:{color:'#1f2937'}}, y:{ticks:{color:'#4b5563'},grid:{color:'#1f2937'}}}}
+  });
+  const counts = [0,0,0,0,0];
+  predictionHistory.forEach(e=>{ if(e.level>=1&&e.level<=5) counts[e.level-1]++; });
+  const ctx2 = document.getElementById('distChart').getContext('2d');
+  if(distChartInst) distChartInst.destroy();
+  distChartInst = new Chart(ctx2,{
+    type:'bar',
+    data:{ labels:['Excellent (<2)','Good (2–4)','Fair (4–8)','Poor (8–20)','Very Poor (>20)'],
+      datasets:[{label:'Count', data:counts, backgroundColor:['#22c55e','#84cc16','#eab308','#f97316','#ef4444'], borderRadius:6}] },
+    options:{responsive:true, plugins:{legend:{display:false}},
+      scales:{x:{ticks:{color:'#94a3b8'},grid:{display:false}}, y:{ticks:{color:'#4b5563'},grid:{color:'#1f2937'},beginAtZero:true}}}
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// REPORTS
+// ═══════════════════════════════════════════════════════════
+function renderReportStats(){
+  const total = predictionHistory.length;
+  if(!total){ document.getElementById('reportStats').innerHTML='<p style="color:#4b5563">No data yet.</p>'; return; }
+  const bods = predictionHistory.map(e=>e.BOD||e.bod||0);
+  const avg  = (bods.reduce((a,b)=>a+b,0)/total).toFixed(2);
+  const mx   = Math.max(...bods).toFixed(2);
+  const mn   = Math.min(...bods).toFixed(2);
+  const good = predictionHistory.filter(e=>e.level<=2).length;
+  document.getElementById('reportStats').innerHTML=`
+    <div class="report-stat"><div class="val">${total}</div><div class="lbl">Total Predictions</div></div>
+    <div class="report-stat"><div class="val">${avg}</div><div class="lbl">Average BOD (mg/L)</div></div>
+    <div class="report-stat"><div class="val">${mx}</div><div class="lbl">Max BOD (mg/L)</div></div>
+    <div class="report-stat"><div class="val">${mn}</div><div class="lbl">Min BOD (mg/L)</div></div>
+    <div class="report-stat"><div class="val">${good}</div><div class="lbl">Good Quality Readings</div></div>
+    <div class="report-stat"><div class="val">${total-good}</div><div class="lbl">Readings Needing Attention</div></div>`;
+}
+
+function downloadCSV(){
+  window.location.href = '/download';
+  document.getElementById('reportStatus').textContent = '✅ Downloading all records...';
+}
+
+function downloadFiltered(){
+  const start = document.getElementById('startDT').value;
+  const end   = document.getElementById('endDT').value;
+  if(!start&&!end){ document.getElementById('reportStatus').textContent='⚠️ Please select at least a start or end date.'; return; }
+  let url = '/download?';
+  if(start) url += `start=${start.replace('T',' ')}&`;
+  if(end)   url += `end=${end.replace('T',' ')}`;
+  window.location.href = url;
+  document.getElementById('reportStatus').textContent = '✅ Downloading filtered records...';
+}
+
+// ═══════════════════════════════════════════════════════════
+// CONSECUTIVE ALERT POPUP
+// ═══════════════════════════════════════════════════════════
+function showAlertPopup(alert, alertKey){
+  const qualityColors = {'Fair':'#eab308','Poor':'#f97316','Very Poor':'#ef4444'};
+  const color = qualityColors[alert.worst_quality] || '#ef4444';
+  document.getElementById('alertPopupLoc').textContent = alert.message.split('has had')[0].replace('⚠️ ','').trim();
+  document.getElementById('alertPopupDays').textContent = alert.consecutive_days;
+  document.getElementById('alertPopupDays').style.color = color;
+  document.getElementById('alertPopupBody').innerHTML =
+    `Water quality has been recorded as <b>${alert.worst_quality}</b> or worse for <b>${alert.consecutive_days} consecutive days</b>.<br><br>
+     This may indicate a pollution event, sewage discharge, or other environmental issue requiring immediate attention.<br><br>
+     <b>Recommended action:</b> Conduct an on-site inspection and collect physical water samples for lab verification.`;
+  if(alertKey) shownAlerts.add(alertKey);
+  document.getElementById('alertPopupOverlay').style.display = 'flex';
+}
+
+function closeAlertPopupBtn(){
+  document.getElementById('alertPopupOverlay').style.display = 'none';
+}
+
+function closeAlertPopup(e){
+  if(e.target === document.getElementById('alertPopupOverlay'))
+    document.getElementById('alertPopupOverlay').style.display = 'none';
+}
+
+// Init
+updateDashboard();
+
+</script>
+</body>
+</html>

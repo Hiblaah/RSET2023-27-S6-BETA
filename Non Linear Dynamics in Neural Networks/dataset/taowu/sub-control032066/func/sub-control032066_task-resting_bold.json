@@ -1,0 +1,14 @@
+{
+    "RepetitionTime": "2", 
+    "EchoTime": "0.05", 
+    "Instruction": "Think of nothing in particular, but do not fall asleep.", 
+    "Slices": "28", 
+    "MagneticFieldStrenth": "3", 
+    "FlipAngle": "90", 
+    "Sequence": "Echo Planar", 
+    "TaskDescription": "Resting State with no visual stimulus (eyes closed)", 
+    "TaskName": "rest", 
+    "Resolution": "4*4*5", 
+    "ManufacturesModelName": "Magnetom Trio", 
+    "Manufacturer": "Siemens "
+}
