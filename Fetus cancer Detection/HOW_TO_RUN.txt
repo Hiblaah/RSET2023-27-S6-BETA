@@ -1,0 +1,92 @@
+===============================================================
+  NeuroScan AI — HOW TO RUN (Windows)
+===============================================================
+
+STEP 1: PUT ALL FILES IN ONE FOLDER
+--------------------------------------
+Your folder should look like this:
+  C:\Users\lenovo\Downloads\files\
+      app.py
+      train.py
+      index.html
+      requirements.txt
+      Resnet_fineTuning.pth      ← your trained model file
+      HOW_TO_RUN.txt
+
+
+STEP 2: OPEN COMMAND PROMPT IN THAT FOLDER
+--------------------------------------------
+  - Open File Explorer → go to your files folder
+  - Click the address bar → type "cmd" → press Enter
+  (This opens Command Prompt directly in that folder)
+
+
+STEP 3: INSTALL REQUIRED PACKAGES (only once)
+----------------------------------------------
+  pip install -r requirements.txt
+
+
+STEP 4: START THE BACKEND SERVER
+----------------------------------
+  uvicorn app:app --reload --host 0.0.0.0 --port 8000
+
+  You should see:
+    INFO:     Uvicorn running on http://0.0.0.0:8000
+    [OK] Model loaded from Resnet_fineTuning.pth on cpu
+
+
+STEP 5: OPEN THE WEBSITE
+--------------------------
+  Double-click index.html  (opens in your browser)
+  OR open your browser and go to:  http://localhost:8000
+
+
+STEP 6: USE THE APP
+---------------------
+  1. Click "Drop Ultrasound Here" and upload an ultrasound image
+  2. Click "Run AI Analysis"
+  3. See the result: Normal / Benign / Malignant
+  4. View the Grad-CAM heatmap showing what the AI focused on
+
+
+===============================================================
+  TRAINING FROM SCRATCH (Optional)
+===============================================================
+
+If you want to retrain the model with your dataset:
+
+1. Make sure your data folders are structured like:
+     train\benign\
+     train\malignant\
+     train\normal\
+     validation\benign\
+     validation\malignant\
+     validation\normal\
+     test\benign\
+     test\malignant\
+     test\normal\
+
+2. Run:
+     python train.py
+
+3. Wait for training to complete (~30-40 epochs)
+   The best model will be saved as: Resnet_fineTuning.pth
+
+
+===============================================================
+  TROUBLESHOOTING
+===============================================================
+
+Problem: "pip is not recognized"
+  Fix: Install Python from https://python.org (check "Add to PATH")
+
+Problem: "CUDA out of memory"
+  Fix: In app.py, change BATCH_SIZE to 16
+
+Problem: Backend shows "Model not found — DEMO mode"
+  Fix: Make sure Resnet_fineTuning.pth is in the SAME folder as app.py
+
+Problem: Website shows "Backend offline"
+  Fix: Make sure you ran Step 4 first, then refresh the page
+
+===============================================================
